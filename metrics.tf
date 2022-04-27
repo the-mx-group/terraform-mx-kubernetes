@@ -12,6 +12,6 @@ resource "helm_release" "metrics-server" {
   name       = "metrics-server"
   repository = "https://kubernetes-sigs.github.io/metrics-server/"
   chart      = "metrics-server"
-  version    = "3.8.2"
+  version    = local.metrics_version
   namespace  = local.metrics_namespace
 }

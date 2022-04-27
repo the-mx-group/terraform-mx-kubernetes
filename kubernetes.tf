@@ -6,7 +6,7 @@ module "kubernetes" {
   cluster_version = var.kubernetes_version
   cluster_addons = {
     "vpc-cni" : {
-      "addon_version" : "v1.10.2-eksbuild.1",
+      "addon_version" : "v1.11.0-eksbuild.1",
       "resolve_conflicts" : "OVERWRITE"
     }
   }

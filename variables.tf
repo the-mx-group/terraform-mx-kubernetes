@@ -81,6 +81,7 @@ variable "private_subnets" {
     az         = string
     cidr_block = string
   }))
+  default = []
   description = "Private subnets to create and use for this cluster."
 }
 

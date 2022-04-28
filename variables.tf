@@ -29,9 +29,9 @@ variable "autoscaling" {
     enabled = bool
     version = string
   })
-  default = { enabled: false, version = "" }
+  default = { enabled : false, version = "" }
   validation {
-    condition = var.autoscaling.enabled == false || length(var.autoscaling.version) > 2
+    condition     = var.autoscaling.enabled == false || length(var.autoscaling.version) > 2
     error_message = "When enabling autoscaling, you must specify a version that works with your Kubernetes version.  See https://github.com/kubernetes/autoscaler/releases?q=v1.22&expanded=true for details."
   }
 }
@@ -109,7 +109,14 @@ variable "role_mapping" {
   description = "IAM Role ARNs to map to cluster roles"
 }
 
+variable "node_security_groups" {
+  type        = list(string)
+  description = "Extra security groups to attach to nodes"
+  default     = []
+}
+
 variable "full_access_ip_blocks" {
   type        = list(string)
   description = "IPs to allow in to all SGs created by this recipe"
+  default     = []
 }

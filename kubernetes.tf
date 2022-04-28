@@ -26,7 +26,7 @@ module "kubernetes" {
 
       instance_types = var.instance_types
 
-      vpc_security_group_ids = [aws_security_group.kubernetes.id]
+      vpc_security_group_ids = concat([aws_security_group.kubernetes.id], var.node_security_groups)
 
       tags = {
         CostCenter                                        = "${var.cost_center}"

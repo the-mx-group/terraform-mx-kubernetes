@@ -32,7 +32,7 @@ variable "autoscaling" {
   default = { enabled: false, version = "" }
   validation {
     condition = var.autoscaling.enabled == false || length(var.autoscaling.version) > 2
-    error_message = "When enabling autoscaling, you must specify a version that works with your Kubernetes version.  See https://github.com/kubernetes/autoscaler/releases?q=v1.22&expanded=true"
+    error_message = "When enabling autoscaling, you must specify a version that works with your Kubernetes version.  See https://github.com/kubernetes/autoscaler/releases?q=v1.22&expanded=true for details."
   }
 }
 
@@ -48,7 +48,7 @@ variable "autoscaling_max" {
 variable "enable_efs" {
   type        = bool
   default     = false
-  description = "Whether to deploy the EFS CSI module"
+  description = "Whether to deploy the EFS CSI module.  Note that your cluster must contian at least 2 nodes to enable this module."
 }
 
 variable "cost_center" {

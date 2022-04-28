@@ -4,9 +4,9 @@
 
 # Setup role and policy to allow autoscaling
 resource "aws_iam_role_policy_attachment" "workers_autoscaling" {
-  for_each = toset(var.granted_roles)
+  for_each = var.granted_roles
   policy_arn = aws_iam_policy.worker_autoscaling.arn
-  role       = each.key
+  role       = each.value
 }
 
 resource "aws_iam_policy" "worker_autoscaling" {

@@ -79,7 +79,7 @@ EOF
 
 resource "aws_iam_role" "efs-csi-driver-role" {
   name = "AmazonEKS_EFS_CSI_DriverRole-${var.cluster_name}"
-  assume_role_policy = templatefile("../policy/oidc_assume_role_policy.json", {
+  assume_role_policy = templatefile("${path.module}/policy/oidc_assume_role_policy.json", {
     OIDC_ARN  = var.oidc_arn,
     OIDC_URL  = replace(var.oidc_url, "https://", ""),
     NAMESPACE = "kube-system",

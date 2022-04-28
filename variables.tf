@@ -24,6 +24,18 @@ variable "instance_types" {
   description = "The instance types to provision (e.g., t3.medium)"
 }
 
+variable "autoscaling" {
+  type = object({
+    enabled = bool
+    version = string
+  })
+  default = { enabled: false, version = "" }
+  validation {
+    condition = var.autoscaling.enabled == false || length(var.autoscaling.version) > 2
+    error_message = "When enabling autoscaling, you must specify a version that works with your Kubernetes version.  See https://github.com/kubernetes/autoscaler/releases?q=v1.22&expanded=true"
+  }
+}
+
 variable "autoscaling_min" {
   type        = number
   description = "The minimum number of cluster nodes available"
@@ -31,12 +43,6 @@ variable "autoscaling_min" {
 variable "autoscaling_max" {
   type        = number
   description = "The minimum number of cluster nodes to provision"
-}
-
-variable "enable_autoscaler" {
-  type        = bool
-  default     = false
-  description = "Whether to deploy the Cluster Autoscaler"
 }
 
 variable "enable_efs" {
@@ -81,7 +87,7 @@ variable "private_subnets" {
     az         = string
     cidr_block = string
   }))
-  default = []
+  default     = []
   description = "Private subnets to create and use for this cluster."
 }
 

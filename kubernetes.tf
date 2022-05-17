@@ -46,10 +46,9 @@ module "kubernetes" {
 # and https://github.com/terraform-aws-modules/terraform-aws-eks/blob/master/docs/faq.md
 module "eks_auth" {
   source  = "aidanmelen/eks-auth/aws"
-  version = "0.9.0"
+  version = "1.0.0"
   eks     = module.kubernetes
 
   map_roles = var.role_mapping
   map_users = var.user_mapping
-
 }

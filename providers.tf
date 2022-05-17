@@ -13,7 +13,7 @@ provider "kubernetes" {
 }
 
 # used to patch the aws-auth configmap
-provider "kubectl" {
+provider "kubectl" { # remove this once everyone has upgraded to the latest version
   host                   = module.kubernetes.cluster_endpoint
   cluster_ca_certificate = base64decode(module.kubernetes.cluster_certificate_authority_data)
   token                  = data.aws_eks_cluster_auth.kubernetes.token

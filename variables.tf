@@ -120,3 +120,13 @@ variable "full_access_ip_blocks" {
   description = "IPs to allow in to all SGs created by this recipe"
   default     = []
 }
+
+variable "api_access_security_groups" {
+  type = list(object({
+    description    = string
+    security_group = string
+  }))
+  description = "Security groups that should be able to access the internal Kubernetes API"
+
+  default = []
+}

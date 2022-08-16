@@ -16,6 +16,17 @@ module "kubernetes" {
   )
   vpc_id                          = data.aws_vpc.kubernetes.id
   cluster_endpoint_private_access = true
+  cluster_security_group_additional_rules = {
+    for group in var.api_access_security_groups :
+      group.security_group => {
+        description       = group.description
+        type              = "ingress"
+        from_port         = 0
+        to_port           = 443
+        protocol          = "tcp"
+        security_group_id = group.security_group
+      }
+  }
 
   eks_managed_node_groups = {
     "${var.prog_name}-main" = {

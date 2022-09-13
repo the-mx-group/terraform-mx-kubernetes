@@ -14,9 +14,30 @@ resource "aws_vpc" "kubernetes" {
   }
 }
 
+#default sg
+resource "aws_default_security_group" "kubernetes" {
+  count  = local.create_vpc ? 1 : 0
+  vpc_id = aws_vpc.kubernetes[0].id
+
+  ingress {
+    protocol  = -1
+    self      = true
+    from_port = 0
+    to_port   = 0
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+
 # Internet gateway and routing for public items
 resource "aws_internet_gateway" "gw" {
-  count                = local.create_vpc ? 1 : 0
+  count  = local.create_vpc ? 1 : 0
   vpc_id = aws_vpc.kubernetes[0].id
 
   tags = {
@@ -25,15 +46,15 @@ resource "aws_internet_gateway" "gw" {
 }
 
 data "aws_route_table" "default" {
-  vpc_id  = data.aws_vpc.kubernetes.id
+  vpc_id = data.aws_vpc.kubernetes.id
   filter {
-    name = "association.main"
-    values = [ true ]
+    name   = "association.main"
+    values = [true]
   }
 }
 
 resource "aws_route" "internet" {
-  count                = local.create_vpc ? 1 : 0
+  count                  = local.create_vpc ? 1 : 0
   route_table_id         = data.aws_route_table.default.id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.gw[0].id

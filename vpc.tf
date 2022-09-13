@@ -13,6 +13,32 @@ resource "aws_vpc" "kubernetes" {
     CostCenter = var.cost_center
   }
 }
+
+# Internet gateway and routing for public items
+resource "aws_internet_gateway" "gw" {
+  count                = local.create_vpc ? 1 : 0
+  vpc_id = aws_vpc.kubernetes[0].id
+
+  tags = {
+    Name = "${local.friendly_name} Internet Gateway"
+  }
+}
+
+data "aws_route_table" "default" {
+  vpc_id  = data.aws_vpc.kubernetes.id
+  filter {
+    name = "association.main"
+    values = [ true ]
+  }
+}
+
+resource "aws_route" "internet" {
+  count                = local.create_vpc ? 1 : 0
+  route_table_id         = data.aws_route_table.default.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.gw[0].id
+}
+
 resource "aws_subnet" "kubernetes" {
   for_each = {
     for index, subnet in var.public_subnets :

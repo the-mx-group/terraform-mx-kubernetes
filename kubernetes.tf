@@ -4,12 +4,21 @@ module "kubernetes" {
   version         = "18.26.6"
   cluster_name    = local.cluster_name
   cluster_version = var.kubernetes_version
-  cluster_addons = {
-    "vpc-cni" : {
-      "addon_version" : "v1.11.0-eksbuild.1",
-      "resolve_conflicts" : "OVERWRITE"
-    }
-  }
+  cluster_addons = merge(
+    {
+      "vpc-cni" : {
+        "addon_version" : "v1.11.0-eksbuild.1",
+        "resolve_conflicts" : "OVERWRITE"
+      }
+    },
+    var.ebs_addon_enabled ? {
+      "aws-ebs-csi-driver" : {
+        "addon_version" : "v1.11.2-eksbuild.1",
+        "resolve_conflicts" : "OVERWRITE"
+      }
+    } : {}
+  )
+
   subnet_ids = concat(
     [for sub in aws_subnet.kubernetes : sub.id],
     [for sub in aws_subnet.kubernetes-private : sub.id]

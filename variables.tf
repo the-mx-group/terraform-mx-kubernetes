@@ -130,3 +130,9 @@ variable "api_access_security_groups" {
 
   default = []
 }
+
+variable "ebs_addon_enabled" {
+  type = bool
+  description = "Should the EBS addon be installed"
+  default = false
+}

@@ -47,7 +47,6 @@ resource "helm_release" "aws-load-balancer-controller" {
   version    = local.ingress_helm_version
   namespace  = "kube-system"
 
-
   set {
     name  = "clusterName"
     value = local.cluster_name
@@ -71,6 +70,11 @@ resource "helm_release" "aws-load-balancer-controller" {
   set {
     name  = "serviceAccount.name"
     value = "aws-load-balancer-controller"
+  }
+
+  set {
+    name = "podDisruptionBudget.maxUnavailable"
+    value = "1"
   }
 
   depends_on = [

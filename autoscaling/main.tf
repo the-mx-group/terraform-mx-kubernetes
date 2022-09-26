@@ -319,3 +319,22 @@ resource "kubernetes_deployment" "autoscaler" {
     }
   }
 }
+
+# PDB for autoscaler
+resource "kubernetes_pod_disruption_budget" "autoscaler" {
+  metadata {
+    name = "cluster-autoscaler"
+    namespace = "kube-system"
+    labels = {
+      "app" = "cluster-autoscaler"
+    }
+  }
+  spec {
+    max_unavailable = "1"
+    selector {
+      match_labels = {
+        "app" = "cluster-autoscaler"
+      }
+    }
+  }
+}

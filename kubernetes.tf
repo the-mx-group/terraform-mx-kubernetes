@@ -37,6 +37,12 @@ module "kubernetes" {
       }
   }
 
+  # Self Managed Node Group(s)
+  eks_managed_node_group_defaults = {
+    update_launch_template_default_version = true
+    iam_role_additional_policies           = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
+  }
+
   eks_managed_node_groups = {
     "${var.prog_name}-main" = {
       min_size     = var.autoscaling_min

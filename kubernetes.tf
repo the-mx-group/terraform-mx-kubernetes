@@ -8,8 +8,12 @@ module "kubernetes" {
     {
       "vpc-cni" : {
         "addon_version" : "v1.12.5-eksbuild.2",
-        "resolve_conflicts" : "OVERWRITE"
-      }
+        "resolve_conflicts" : "OVERWRITE",
+      },
+      "coredns": {
+        "resolve_conflicts" = "OVERWRITE"
+      },
+      "kube-proxy": {}
     },
     var.ebs_addon_enabled ? {
       "aws-ebs-csi-driver" : {

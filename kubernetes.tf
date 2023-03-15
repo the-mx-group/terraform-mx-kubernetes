@@ -7,13 +7,13 @@ module "kubernetes" {
   cluster_addons = merge(
     {
       "vpc-cni" : {
-        "addon_version" : "v1.11.3-eksbuild.1",
+        "addon_version" : "v1.12.5-eksbuild.2",
         "resolve_conflicts" : "OVERWRITE"
       }
     },
     var.ebs_addon_enabled ? {
       "aws-ebs-csi-driver" : {
-        "addon_version" : "v1.11.2-eksbuild.1",
+        "addon_version" : "v1.16.1-eksbuild.1",
         "resolve_conflicts" : "OVERWRITE"
       }
     } : {}

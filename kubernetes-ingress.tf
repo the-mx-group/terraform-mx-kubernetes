@@ -6,7 +6,7 @@ data "http" "aws-load-balancer-controller-policy" {
 
 resource "aws_iam_policy" "aws-load-balancer-controller-policy" {
   name   = "${local.cluster_name}-AWSLoadBalancerControllerIAMPolicy"
-  policy = data.http.aws-load-balancer-controller-policy.body
+  policy = data.http.aws-load-balancer-controller-policy.response_body
 }
 
 resource "aws_iam_role" "aws-load-balancer-controller-role" {

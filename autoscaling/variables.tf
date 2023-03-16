@@ -10,3 +10,7 @@ variable "autoscaling_version" {
   type        = string
   description = "The autoscaling version to use"
 }
+variable "kubernetes_version" {
+  type        = string
+  description = "The Kubernetes version in use on the cluster.  Affects which APIs we use to create resources"
+}

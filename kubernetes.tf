@@ -13,7 +13,9 @@ module "kubernetes" {
       "coredns": {
         "resolve_conflicts" = "OVERWRITE"
       },
-      "kube-proxy": {}
+      "kube-proxy": {
+        "resolve_conflicts" = "OVERWRITE"
+      }
     },
     var.ebs_addon_enabled ? {
       "aws-ebs-csi-driver" : {

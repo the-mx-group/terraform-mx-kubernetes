@@ -16,7 +16,26 @@ resource "helm_release" "efs-storage-class" {
   }
 }
 
+# PDB for autoscaler, for kube 1.25+
+resource "kubernetes_pod_disruption_budget_v1" "autoscaler" {
+  count = tonumber(var.kubernetes_version) >= 1.25 ? 1 : 0
+  metadata {
+    name      = "efs-csi-controller-pdb"
+    namespace = "kube-system"
+  }
+  spec {
+    max_unavailable = 1
+    selector {
+      match_labels = {
+        "app" = "efs-csi-controller"
+      }
+    }
+  }
+}
+
+# PDB for autoscaler, for kube 1.24 and prior
 resource "kubernetes_pod_disruption_budget" "efs-csi-controller-pdb" {
+  count = tonumber(var.kubernetes_version) < 1.25 ? 1 : 0
   metadata {
     name      = "efs-csi-controller-pdb"
     namespace = "kube-system"

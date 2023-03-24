@@ -3,6 +3,11 @@ variable "cluster_name" {
   description = "The name of this Kubernetes cluster"
 }
 
+variable "kubernetes_version" {
+  type        = string
+  description = "The Kubernetes version in use on the cluster"
+}
+
 variable "oidc_arn" {
   type        = string
   description = "The ARN for this cluster's OIDC endpoint"

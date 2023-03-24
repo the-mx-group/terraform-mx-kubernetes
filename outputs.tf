@@ -25,3 +25,8 @@ output "security_group" {
   value = aws_security_group.kubernetes.id
   description = "The ID of the security group created for nodes"
 }
+output "public_subnet_ids" {
+  value = [
+    for net in aws_subnet.kubernetes : net.id
+  ]
+}

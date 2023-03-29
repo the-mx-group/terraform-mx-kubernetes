@@ -9,11 +9,16 @@ module "kubernetes" {
       "vpc-cni" : {
         "addon_version" : "v1.12.5-eksbuild.2",
         "resolve_conflicts" : "OVERWRITE",
+        "configuration_values" : {
+          "env" : {
+            "ENABLE_PREFIX_DELEGATION" : "true"
+          }
+        }
       },
-      "coredns": {
+      "coredns" : {
         "resolve_conflicts" = "OVERWRITE"
       },
-      "kube-proxy": {
+      "kube-proxy" : {
         "resolve_conflicts" = "OVERWRITE"
       }
     },
@@ -33,14 +38,14 @@ module "kubernetes" {
   cluster_endpoint_private_access = true
   cluster_security_group_additional_rules = {
     for group in var.api_access_security_groups :
-      group.security_group => {
-        description              = group.description
-        type                     = "ingress"
-        from_port                = 0
-        to_port                  = 443
-        protocol                 = "tcp"
-        source_security_group_id = group.security_group
-      }
+    group.security_group => {
+      description              = group.description
+      type                     = "ingress"
+      from_port                = 0
+      to_port                  = 443
+      protocol                 = "tcp"
+      source_security_group_id = group.security_group
+    }
   }
 
   # Self Managed Node Group(s)

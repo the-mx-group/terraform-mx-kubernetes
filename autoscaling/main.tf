@@ -276,7 +276,7 @@ resource "kubernetes_deployment" "autoscaler" {
         service_account_name = "cluster-autoscaler"
         automount_service_account_token = true
         container {
-          image = "k8s.gcr.io/autoscaling/cluster-autoscaler:v${var.autoscaling_version}"
+          image = "registry.k8s.io/autoscaling/cluster-autoscaler:v${var.autoscaling_version}"
           image_pull_policy = "Always"
           name  = "cluster-autoscaler"
 

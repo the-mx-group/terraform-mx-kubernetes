@@ -1,19 +1,19 @@
 #actually provision the kubernetes cluster
 module "kubernetes" {
   source          = "terraform-aws-modules/eks/aws"
-  version         = "18.31.2"
+  version         = "19.13.1"
   cluster_name    = local.cluster_name
   cluster_version = var.kubernetes_version
+  cluster_endpoint_public_access = true
   cluster_addons = merge(
     {
       "vpc-cni" : {
-        "addon_version" : "v1.12.5-eksbuild.2",
         "resolve_conflicts" : "OVERWRITE",
-        "configuration_values" : {
+        "configuration_values" : jsonencode({
           "env" : {
             "ENABLE_PREFIX_DELEGATION" : "true"
           }
-        }
+        })
       },
       "coredns" : {
         "resolve_conflicts" = "OVERWRITE"
@@ -24,7 +24,6 @@ module "kubernetes" {
     },
     var.ebs_addon_enabled ? {
       "aws-ebs-csi-driver" : {
-        "addon_version" : "v1.16.1-eksbuild.1",
         "resolve_conflicts" : "OVERWRITE"
       }
     } : {}
@@ -51,7 +50,9 @@ module "kubernetes" {
   # Self Managed Node Group(s)
   eks_managed_node_group_defaults = {
     update_launch_template_default_version = true
-    iam_role_additional_policies           = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
+    iam_role_additional_policies           = {
+      "ssm-managed-instance": "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+    }
   }
 
   eks_managed_node_groups = {

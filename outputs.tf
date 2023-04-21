@@ -10,7 +10,7 @@ output "oidc_arn" {
   description = "ARN for the OIDC provider for this cluster"
 }
 output "cluster_id" {
-  value = module.kubernetes.cluster_id
+  value = module.kubernetes.cluster_name
   description = "Cluster ID"
 }
 output "cluster_endpoint" {

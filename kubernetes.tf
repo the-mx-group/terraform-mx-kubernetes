@@ -1,3 +1,13 @@
+data "aws_caller_identity" "current" {}
+data "aws_iam_session_context" "current" {
+  # This data source provides information on the IAM source role of an STS assumed role
+  # For non-role ARNs, this data source simply passes the ARN through issuer ARN
+  # Ref https://github.com/terraform-aws-modules/terraform-aws-eks/issues/2327#issuecomment-1355581682
+  # Ref https://github.com/hashicorp/terraform-provider-aws/issues/28381
+  arn = data.aws_caller_identity.current.arn
+}
+
+
 #actually provision the kubernetes cluster
 module "kubernetes" {
   source          = "terraform-aws-modules/eks/aws"
@@ -28,6 +38,11 @@ module "kubernetes" {
       }
     } : {}
   )
+
+  kms_key_administrators = concat(var.kms_key_administrators, [
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root",
+    data.aws_iam_session_context.current.issuer_arn
+  ])
 
   subnet_ids = concat(
     [for sub in aws_subnet.kubernetes : sub.id],

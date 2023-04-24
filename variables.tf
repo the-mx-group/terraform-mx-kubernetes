@@ -131,8 +131,14 @@ variable "api_access_security_groups" {
   default = []
 }
 
+variable "kms_key_administrators" {
+  type        = list(string)
+  default     = []
+  description = "ARNs of users who should be able to administer the KMS key used to encrypt secrets at rest in the cluster"
+}
+
 variable "ebs_addon_enabled" {
-  type = bool
+  type        = bool
   description = "Should the EBS addon be installed"
-  default = false
+  default     = false
 }

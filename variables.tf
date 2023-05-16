@@ -142,3 +142,11 @@ variable "ebs_addon_enabled" {
   description = "Should the EBS addon be installed"
   default     = false
 }
+
+variable "prometheus" {
+  type = object({
+    enabled = bool
+    namespace = optional(string)
+  })
+  default = { enabled : false }
+}

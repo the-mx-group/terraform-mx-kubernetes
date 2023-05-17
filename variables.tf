@@ -147,6 +147,15 @@ variable "prometheus" {
   type = object({
     enabled = bool
     namespace = optional(string)
+    alert_config = optional(string)
   })
   default = { enabled : false }
+  description = <<-EOT
+    Should Prometheus be configured for the instance. Default is false.
+    If enabled, you can optionally specify a namespace and alert_config.
+    * namespace is the Kubernetes namespace to create all resources
+    * alert_config should be a YAML string that can be decoded by the Prometheus alertmanager.
+      A default configuration is provided, so you only need to pass parts of the config that you want to change (for example, a receivers array)
+      See https://prometheus.io/docs/alerting/latest/configuration/ for details.
+    EOT
 }

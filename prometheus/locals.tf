@@ -10,5 +10,6 @@ locals {
     "defaultRules.rules.kubelet" = false,
     "defaultRules.rules.kubeSchedulerAlerting" = false,
     "defaultRules.rules.kubeSchedulerRecording" = false,
+    "prometheusOperator.kubeletService.enabled" = false,
   }
 }

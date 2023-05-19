@@ -48,6 +48,12 @@ variable "autoscaling_max" {
 variable "enable_efs" {
   type        = bool
   default     = false
+  description = "DEPRECATED: use efs_enabled.  Whether to deploy the EFS CSI module.  Note that your cluster must contian at least 2 nodes to enable this module."
+}
+
+variable "efs_enabled" {
+  type        = bool
+  default     = false
   description = "Whether to deploy the EFS CSI module.  Note that your cluster must contian at least 2 nodes to enable this module."
 }
 

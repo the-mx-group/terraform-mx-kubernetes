@@ -1,5 +1,5 @@
 module "efs" {
-  count = (var.enable_efs && var.autoscaling_min >= 2) ? 1 : 0
+  count = ((var.enable_efs || var.efs_enabled) && var.autoscaling_min >= 2) ? 1 : 0
   source = "./efs"
   cluster_name = local.cluster_name
   kubernetes_version = var.kubernetes_version

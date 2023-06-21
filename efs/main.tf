@@ -16,7 +16,7 @@ resource "helm_release" "efs-storage-class" {
   }
 
   set {
-    name = "controller.serviceAccount.annotations.eks.amazonaws.com/role-arn"
+    name = "controller.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
     value = aws_iam_role.efs-csi-driver-role.arn
   }
 }

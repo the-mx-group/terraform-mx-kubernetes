@@ -14,6 +14,11 @@ resource "helm_release" "efs-storage-class" {
     name  = "controller.podAnnotations.cluster-autoscaler\\.kubernetes\\.io/safe-to-evict"
     value = "\"true\""
   }
+
+  set {
+    name = "controller.serviceAccount.annotations.eks.amazonaws.com/role-arn"
+    value = aws_iam_role.efs-csi-driver-role.arn
+  }
 }
 
 # PDB for efs csi controller, for kube 1.25+
@@ -124,13 +129,4 @@ resource "aws_iam_role_policy_attachment" "efs-csi-driver-role" {
   role       = aws_iam_role.efs-csi-driver-role.name
   policy_arn = aws_iam_policy.efs-policy.arn
   depends_on = [aws_iam_role.efs-csi-driver-role]
-}
-
-resource "kubernetes_service_account" "efs-csi-controller-sa" {
-  metadata {
-    name = "efs-csi-controller-sa"
-    annotations = {
-      "eks.amazonaws.com/role-arn" = aws_iam_role.efs-csi-driver-role.arn
-    }
-  }
 }

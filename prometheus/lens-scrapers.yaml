@@ -1,7 +1,8 @@
 prometheus:
   prometheusSpec:
     additionalArgs:
-      - storage.tsdb.retention.time=3d
+      - name: storage.tsdb.retention.time
+        value: 3d
     additionalScrapeConfigs:
       # Scrape config for API servers.
       #

@@ -6,7 +6,6 @@
 #also provision a NAT gateway and IP address for nonpublic instances
 resource "aws_eip" "nat-gateway" {
   count = local.create_nat_gateway ? 1 : 0
-  domain = "vpc"
 }
 
 # create a public subnet for the nat gateway if one is not provided

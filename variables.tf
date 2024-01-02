@@ -89,12 +89,24 @@ variable "public_subnets" {
 }
 
 variable "private_subnets" {
-  type = list(object({
-    az         = string
-    cidr_block = string
-  }))
-  default     = []
+  type = object({
+    networks = list(object({
+      az         = string
+      cidr_block = string
+
+    }))
+    nat_gateway = object({
+      id         = optional(string)
+      cidr_block = optional(string)
+      az         = optional(string)
+    })
+  })
+  default     = { networks = [], nat_gateway = { id = "", cidr_block = "", az = "" } }
   description = "Private subnets to create and use for this cluster."
+  validation {
+    condition     = length(var.private_subnets.networks) == 0 || var.private_subnets.nat_gateway.id != "" || ( var.private_subnets.nat_gateway.cidr_block != null && var.private_subnets.nat_gateway.az != null)
+    error_message = "value of nat_gateway.id or az/cidr_block must be specified when private_subnets are specified"
+  }
 }
 
 variable "user_mapping" {

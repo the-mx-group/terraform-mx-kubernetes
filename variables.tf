@@ -85,6 +85,7 @@ variable "public_subnets" {
     az         = string
     cidr_block = string
   }))
+  default = []
   description = "Public subnets to create and use for this cluster."
 }
 
@@ -93,7 +94,6 @@ variable "private_subnets" {
     networks = list(object({
       az         = string
       cidr_block = string
-
     }))
     nat_gateway = object({
       id         = optional(string)

@@ -11,7 +11,7 @@ data "aws_iam_session_context" "current" {
 #actually provision the kubernetes cluster
 module "kubernetes" {
   source          = "terraform-aws-modules/eks/aws"
-  version         = "19.17.2"
+  version         = "19.21.0" // https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/latest
   cluster_name    = local.cluster_name
   cluster_version = var.kubernetes_version
   cluster_endpoint_public_access = true

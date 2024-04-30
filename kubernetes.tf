@@ -10,15 +10,17 @@ data "aws_iam_session_context" "current" {
 
 #actually provision the kubernetes cluster
 module "kubernetes" {
-  source          = "terraform-aws-modules/eks/aws"
-  version         = "19.21.0" // https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/latest
-  cluster_name    = local.cluster_name
-  cluster_version = var.kubernetes_version
+  source                         = "terraform-aws-modules/eks/aws"
+  version                        = "20.8.3" // https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/latest
+  cluster_name                   = local.cluster_name
+  cluster_version                = var.kubernetes_version
   cluster_endpoint_public_access = true
+  authentication_mode            = var.authentication_mode
+  #kms_key_enable_default_policy = false # for v19 compat
   cluster_addons = merge(
     {
       "vpc-cni" : {
-        "resolve_conflicts" : "OVERWRITE",
+        "resolve_conflicts_on_create" : "OVERWRITE",
         "configuration_values" : jsonencode({
           "env" : {
             "ENABLE_PREFIX_DELEGATION" : "true"
@@ -26,15 +28,15 @@ module "kubernetes" {
         })
       },
       "coredns" : {
-        "resolve_conflicts" = "OVERWRITE"
+        "resolve_conflicts_on_create" = "OVERWRITE"
       },
       "kube-proxy" : {
-        "resolve_conflicts" = "OVERWRITE"
+        "resolve_conflicts_on_create" = "OVERWRITE"
       }
     },
     var.ebs_addon_enabled ? {
       "aws-ebs-csi-driver" : {
-        "resolve_conflicts" : "OVERWRITE"
+        "resolve_conflicts_on_create" : "OVERWRITE"
       }
     } : {}
   )
@@ -65,8 +67,8 @@ module "kubernetes" {
   # Self Managed Node Group(s)
   eks_managed_node_group_defaults = {
     update_launch_template_default_version = true
-    iam_role_additional_policies           = {
-      "ssm-managed-instance": "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+    iam_role_additional_policies = {
+      "ssm-managed-instance" : "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
     }
   }
 
@@ -95,13 +97,10 @@ module "kubernetes" {
 
 }
 
-# See https://github.com/terraform-aws-modules/terraform-aws-eks/issues/1901
-# and https://github.com/terraform-aws-modules/terraform-aws-eks/blob/master/docs/faq.md
-module "eks_auth" {
-  source  = "aidanmelen/eks-auth/aws"
-  version = "1.0.0"
-  eks     = module.kubernetes
-
-  map_roles = var.role_mapping
-  map_users = var.user_mapping
+module "eks_aws_auth" {
+  source                    = "terraform-aws-modules/eks/aws//modules/aws-auth" // doubleslash here is intentional; this is a submodule
+  version                   = "~> 20.0"
+  manage_aws_auth_configmap = var.authentication_mode == "API" ? false : true
+  aws_auth_roles = var.role_mapping
+  aws_auth_users = var.user_mapping
 }

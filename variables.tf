@@ -109,6 +109,12 @@ variable "private_subnets" {
   }
 }
 
+variable "authentication_mode" {
+  type = string
+  default = "CONFIG_MAP"
+  description = "AWS has introduced a new API-based auth model.  Change this variable to API_AND_CONFIG_MAP to use it side-by-side with configmap, or API to use it exclusively.  Note that this can't be undone - you can't go backwards in this progression."
+}
+
 variable "user_mapping" {
   type = list(object({
     userarn  = string

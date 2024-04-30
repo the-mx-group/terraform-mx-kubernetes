@@ -89,9 +89,9 @@ module "kubernetes" {
     }
   }
 
-  tags = {
+  tags = merge(var.tags, {
     CostCenter = "${var.cost_center}"
-  }
+  })
 
 }
 

@@ -177,3 +177,9 @@ variable "prometheus" {
       See https://prometheus.io/docs/alerting/latest/configuration/ for details.
     EOT
 }
+
+variable "tags" {
+  type = map(string)
+  default = {}
+  description = "A map of tags to apply to all resources"
+}

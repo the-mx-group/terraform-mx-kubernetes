@@ -81,16 +81,16 @@ module "kubernetes" {
 
       vpc_security_group_ids = concat([aws_security_group.kubernetes.id], var.node_security_groups)
 
-      tags = {
+      tags = merge(var.tags, {
         CostCenter                                        = "${var.cost_center}"
         "k8s.io/cluster-autoscaler/enabled"               = "true"
         "k8s.io/cluster-autoscaler/${local.cluster_name}" = "true"
-      }
+      })
     }
   }
 
   tags = merge(var.tags, {
-    CostCenter = "${var.cost_center}"
+    CostCenter = "${var.cost_center}" // don't let them override CostCenter
   })
 
 }

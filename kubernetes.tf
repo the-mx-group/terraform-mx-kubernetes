@@ -101,6 +101,12 @@ module "eks_aws_auth" {
   source                    = "terraform-aws-modules/eks/aws//modules/aws-auth" // doubleslash here is intentional; this is a submodule
   version                   = "~> 20.0"
   manage_aws_auth_configmap = var.authentication_mode == "API" ? false : true
-  aws_auth_roles = var.role_mapping
+  aws_auth_roles = concat(var.role_mapping, [
+    {
+      rolearn  = module.kubernetes.eks_managed_node_groups["${var.prog_name}-main"].iam_role_arn
+      username = "system:node:{{EC2PrivateDNSName}}"
+      groups   = ["system:bootstrappers", "system:nodes"]
+    }
+  ])
   aws_auth_users = var.user_mapping
 }

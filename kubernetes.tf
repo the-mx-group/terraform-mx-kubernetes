@@ -110,3 +110,9 @@ module "eks_aws_auth" {
   ])
   aws_auth_users = var.user_mapping
 }
+
+# make life easier for migration
+moved {
+  from = module.eks_auth.kubernetes_config_map_v1_data.aws_auth[0]
+  to  = module.eks_aws_auth.kubernetes_config_map_v1_data.aws_auth[0]
+}

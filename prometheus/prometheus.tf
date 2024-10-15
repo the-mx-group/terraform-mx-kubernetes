@@ -8,7 +8,7 @@ resource "helm_release" "prometheus" {
   name       = "monitoring"
   repository = "https://prometheus-community.github.io/helm-charts"
   chart      = "kube-prometheus-stack"
-  version    = local.prometheus_stack_version
+  version    = var.stack_version
   namespace  = var.metrics_namespace
 
   values = concat(

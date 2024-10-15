@@ -8,3 +8,8 @@ variable "alert_config" {
   description = "Extra configuration for alerting"
   default = null
 }
+
+variable "stack_version" {
+  type = string
+  description = "Version of the prometheus stack to install"
+}

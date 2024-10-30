@@ -44,3 +44,20 @@ resource "aws_internet_gateway" "gw" {
     Name = "${local.friendly_name} Internet Gateway"
   }
 }
+
+# reference to the default routing table
+data "aws_route_table" "default" {
+  vpc_id = data.aws_vpc.kubernetes.id
+  filter {
+    name   = "association.main"
+    values = [true]
+  }
+}
+
+# use the gateway to get to the internet
+resource "aws_route" "internet" {
+  count                  = local.create_vpc ? 1 : 0
+  route_table_id         = data.aws_route_table.default.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.gw[0].id
+}

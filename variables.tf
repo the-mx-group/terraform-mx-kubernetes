@@ -70,13 +70,13 @@ variable "region" {
 
 variable "vpc_id" {
   type        = string
-  default     = ""
+  default     = null
   description = "The VPC to use for this cluster.  If not provided, one will be created."
 }
 
 variable "vpc_cidr" {
   type        = string
-  default     = ""
+  default     = null
   description = "If creating a VPC, defines the CIDR block to use"
 }
 

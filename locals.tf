@@ -2,7 +2,7 @@ locals {
   cluster_name      = var.prog_name
   friendly_name     = var.name
   metrics_namespace = "metrics"
-  create_vpc        = var.vpc_id == ""
+  create_vpc        = var.vpc_id == null
   create_nat_gateway = var.private_subnets.nat_gateway.id == "" && length(var.private_subnets.networks) > 0
 
   // ingress

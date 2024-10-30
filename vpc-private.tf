@@ -63,6 +63,7 @@ resource "aws_nat_gateway" "gw" {
 }
 
 data "aws_nat_gateway" "gw" {
+  count         = local.create_nat_gateway ? 1 : 0
   id    = local.create_nat_gateway ? aws_nat_gateway.gw[0].id : var.private_subnets.nat_gateway.gateway_id
 }
 
@@ -82,7 +83,7 @@ resource "aws_route" "workload_private_to_nat" {
   count                  = length(var.private_subnets.networks) > 0 ? 1 : 0
   route_table_id         = aws_route_table.workload_private[0].id
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = data.aws_nat_gateway.gw.id
+  nat_gateway_id         = data.aws_nat_gateway.gw[0].id
 }
 
 # at last, create the subnets

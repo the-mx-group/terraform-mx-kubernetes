@@ -3,16 +3,6 @@
 # Items to create when using public node groups
 # ==================
 
-# Internet gateway and routing for public items
-resource "aws_internet_gateway" "gw" {
-  count  = local.create_vpc ? 1 : 0
-  vpc_id = aws_vpc.kubernetes[0].id
-
-  tags = {
-    Name = "${local.friendly_name} Internet Gateway"
-  }
-}
-
 # reference to the default routing table
 data "aws_route_table" "default" {
   vpc_id = data.aws_vpc.kubernetes.id

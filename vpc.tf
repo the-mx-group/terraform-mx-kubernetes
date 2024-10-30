@@ -35,3 +35,12 @@ resource "aws_default_security_group" "kubernetes" {
   }
 }
 
+# Internet gateway and routing for public items
+resource "aws_internet_gateway" "gw" {
+  count  = local.create_vpc ? 1 : 0
+  vpc_id = aws_vpc.kubernetes[0].id
+
+  tags = {
+    Name = "${local.friendly_name} Internet Gateway"
+  }
+}

@@ -3,7 +3,7 @@ locals {
   friendly_name     = var.name
   metrics_namespace = "metrics"
   create_vpc        = var.vpc_id == null
-  create_nat_gateway = var.private_subnets.nat_gateway.id == "" && length(var.private_subnets.networks) > 0
+  create_nat_gateway = length(var.private_subnets.networks) > 0 && var.private_subnets.nat_gateway.gateway_id == null
 
   // ingress
   ingress_helm_version     = "1.9.1" // https://artifacthub.io/packages/helm/aws/aws-load-balancer-controller

@@ -13,12 +13,6 @@ variable "kubernetes_version" {
   description = "The Kubernetes version to deploy"
 }
 
-variable "autoscaling_version" {
-  type        = string
-  default     = ""
-  description = "The autoscaling version to deploy, if enabled"
-}
-
 variable "instance_types" {
   type        = list(string)
   description = "The instance types to provision (e.g., t3.medium)"
@@ -85,7 +79,7 @@ variable "public_subnets" {
     az         = string
     cidr_block = string
   }))
-  default = []
+  default     = []
   description = "Public subnets to create and use for this cluster."
 }
 
@@ -96,22 +90,25 @@ variable "private_subnets" {
       cidr_block = string
     }))
     nat_gateway = object({
-      id         = optional(string)
-      cidr_block = optional(string)
-      az         = optional(string)
+      gateway_id          = optional(string)
+      cidr_block          = optional(string)
+      az                  = optional(string)
     })
   })
-  default     = { networks = [], nat_gateway = { id = "", cidr_block = "", az = "" } }
-  description = "Private subnets to create and use for this cluster."
+  default     = { networks = [], nat_gateway = { id = null, cidr_block = null, az = null } }
+  description = <<EOT
+    Private subnets to create and use for this cluster.
+    If you specify private subnets, you must either provide a NAT Gateway ID or a cidr block and AZ for us to create one.
+    EOT
   validation {
-    condition     = length(var.private_subnets.networks) == 0 || var.private_subnets.nat_gateway.id != "" || ( var.private_subnets.nat_gateway.cidr_block != null && var.private_subnets.nat_gateway.az != null)
+    condition     = length(var.private_subnets.networks) == 0 || var.private_subnets.nat_gateway.gateway_id != null || (var.private_subnets.nat_gateway.cidr_block != null && var.private_subnets.nat_gateway.az != null)
     error_message = "value of nat_gateway.id or az/cidr_block must be specified when private_subnets are specified"
   }
 }
 
 variable "authentication_mode" {
-  type = string
-  default = "CONFIG_MAP"
+  type        = string
+  default     = "CONFIG_MAP"
   description = "AWS has introduced a new API-based auth model.  Change this variable to API_AND_CONFIG_MAP to use it side-by-side with configmap, or API to use it exclusively.  Note that this can't be undone - you can't go backwards in this progression."
 }
 
@@ -169,11 +166,11 @@ variable "ebs_addon_enabled" {
 
 variable "prometheus" {
   type = object({
-    enabled = bool
-    namespace = optional(string)
+    enabled      = bool
+    namespace    = optional(string)
     alert_config = optional(string)
   })
-  default = { enabled : false }
+  default     = { enabled : false }
   description = <<-EOT
     Should Prometheus be configured for the instance. Default is false.
     If enabled, you can optionally specify a namespace and alert_config.
@@ -185,7 +182,7 @@ variable "prometheus" {
 }
 
 variable "tags" {
-  type = map(string)
-  default = {}
+  type        = map(string)
+  default     = {}
   description = "A map of tags to apply to all resources"
 }

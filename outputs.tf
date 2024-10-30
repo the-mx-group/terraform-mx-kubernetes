@@ -30,3 +30,9 @@ output "public_subnet_ids" {
     for net in aws_subnet.kubernetes : net.id
   ]
 }
+output "private_subnet_ids" {
+  value = [
+    for net in aws_subnet.kubernetes-private : net.id
+  ]
+}
+

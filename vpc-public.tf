@@ -3,23 +3,6 @@
 # Items to create when using public node groups
 # ==================
 
-# reference to the default routing table
-data "aws_route_table" "default" {
-  vpc_id = data.aws_vpc.kubernetes.id
-  filter {
-    name   = "association.main"
-    values = [true]
-  }
-}
-
-# use the gateway to get to the internet
-resource "aws_route" "internet" {
-  count                  = local.create_vpc && length(var.public_subnets) > 0 ? 1 : 0
-  route_table_id         = data.aws_route_table.default.id
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.gw[0].id
-}
-
 # create each subnet for the cluster
 resource "aws_subnet" "kubernetes" {
   for_each = {

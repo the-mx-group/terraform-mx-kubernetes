@@ -63,7 +63,7 @@ resource "aws_nat_gateway" "gw" {
 }
 
 data "aws_nat_gateway" "gw" {
-  count         = local.create_nat_gateway ? 1 : 0
+  count         = length(var.private_subnets.networks) > 0 ? 1 : 0
   id    = local.create_nat_gateway ? aws_nat_gateway.gw[0].id : var.private_subnets.nat_gateway.gateway_id
 }
 
@@ -79,7 +79,7 @@ resource "aws_route_table" "workload_private" {
 
 # use the gateway to get to the internet
 resource "aws_route" "workload_private_to_nat" {
-  depends_on = [ aws_nat_gateway.gw ]
+  depends_on = [ data.aws_nat_gateway.gw ]
   count                  = length(var.private_subnets.networks) > 0 ? 1 : 0
   route_table_id         = aws_route_table.workload_private[0].id
   destination_cidr_block = "0.0.0.0/0"

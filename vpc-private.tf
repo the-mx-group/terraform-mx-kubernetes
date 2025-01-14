@@ -48,7 +48,7 @@ resource "aws_nat_gateway" "gw" {
   subnet_id     = aws_subnet.nat_gateway_public[0].id
 
   tags = {
-    Name = "NAT Gateway for private instances"
+    Name = "NAT Gateway for private instances in the ${var.name} cluster"
   }
 }
 

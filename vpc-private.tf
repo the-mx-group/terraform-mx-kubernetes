@@ -3,16 +3,6 @@
 # Items to create when using private node groups
 # ==================
 
-# Internet gateway and routing for nat subnet
-resource "aws_internet_gateway" "nat_gw" {
-  count  = local.create_nat_gateway ? 1 : 0
-  vpc_id = data.aws_vpc.kubernetes.id
-
-  tags = {
-    Name = "${local.friendly_name} Internet Gateway for NAT"
-  }
-}
-
 # create a public subnet for the nat gateway if one is not provided
 resource "aws_subnet" "nat_gateway_public" {
   count  = local.create_nat_gateway ? 1 : 0
@@ -33,7 +23,7 @@ resource "aws_route_table" "nat_gateway_public" {
   vpc_id = data.aws_vpc.kubernetes.id
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.nat_gw[0].id
+    gateway_id = data.aws_internet_gateway.default_gateway.id
   }
 
   tags = {
@@ -97,10 +87,15 @@ resource "aws_subnet" "kubernetes-private" {
   availability_zone       = each.value.az
   map_public_ip_on_launch = false
 
-
   tags = {
     Name                                          = "${var.name} Private ${each.value.az}"
     "kubernetes.io/cluster/${local.cluster_name}" = "shared"
     "kubernetes.io/role/internal-elb"             = "1"
   }
+}
+
+resource "aws_route_table_association" "kubernetes-private" {
+  for_each = aws_subnet.kubernetes-private
+  subnet_id      = each.value.id
+  route_table_id = aws_route_table.workload_private[0].id
 }

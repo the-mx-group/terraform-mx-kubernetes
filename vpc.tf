@@ -45,6 +45,14 @@ resource "aws_internet_gateway" "gw" {
   }
 }
 
+# find out what the gateway is if we didn't create it
+data "aws_internet_gateway" "default_gateway" {
+  filter {
+    name   = "attachment.vpc-id"
+    values = [data.aws_vpc.kubernetes.id]
+  }
+}
+
 # reference to the default routing table
 data "aws_route_table" "default" {
   vpc_id = data.aws_vpc.kubernetes.id

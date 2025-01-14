@@ -36,3 +36,10 @@ output "private_subnet_ids" {
   ]
 }
 
+output "routing_tables" {
+  value = merge(
+    local.create_vpc ? { "public": data.aws_route_table.default.id } : {},
+    local.create_nat_gateway ? { "nat_gateway": aws_route_table.workload_private[0].id } : {},
+    length(var.private_subnets.networks) > 0 ? { "private_workload": aws_route_table.workload_private[0].id } : {},
+  )
+}

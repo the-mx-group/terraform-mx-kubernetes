@@ -35,6 +35,9 @@ output "private_subnet_ids" {
     for net in aws_subnet.kubernetes-private : net.id
   ]
 }
+output "nat_gateway_ip" {
+  value = length(aws_eip.nat-gateway) > 0 ? one(aws_eip.nat-gateway).public_ip : null
+}
 
 output "routing_tables" {
   value = merge(

@@ -13,7 +13,7 @@ resource "aws_subnet" "nat_gateway_public" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "${var.prog_name}-kubernetes-nat-gateway-public"
+    Name = "NAT gateways in the ${var.name} cluster"
   }
 }
 

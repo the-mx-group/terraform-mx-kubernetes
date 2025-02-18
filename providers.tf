@@ -11,29 +11,13 @@ data "aws_eks_cluster_auth" "kubernetes" {
 provider "kubernetes" {
   host                   = module.kubernetes.cluster_endpoint
   cluster_ca_certificate = base64decode(module.kubernetes.cluster_certificate_authority_data)
-  
-  # Fallback to token if exec method fails
   token = data.aws_eks_cluster_auth.kubernetes.token
-
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
-    command     = "aws"
-    args        = ["eks", "get-token", "--cluster-name", module.kubernetes.cluster_name]
-  }
 }
 
 provider "helm" {
   kubernetes {
     host                   = module.kubernetes.cluster_endpoint
     cluster_ca_certificate = base64decode(module.kubernetes.cluster_certificate_authority_data)
-    
-    # Fallback to token if exec method fails
-    token = data.aws_eks_cluster_auth.kubernetes.token
-    
-    exec {
-      api_version = "client.authentication.k8s.io/v1beta1"
-      command     = "aws"
-      args        = ["eks", "get-token", "--cluster-name", module.kubernetes.cluster_name]
-    }
+    token                  = data.aws_eks_cluster_auth.kubernetes.token
   }
 }

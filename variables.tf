@@ -112,6 +112,30 @@ variable "authentication_mode" {
   description = "AWS has introduced a new API-based auth model.  Change this variable to API_AND_CONFIG_MAP to use it side-by-side with configmap, or API to use it exclusively.  Note that this can't be undone - you can't go backwards in this progression."
 }
 
+variable "access_entries" {
+  type = any
+  default = {}
+  description = <<EODOC
+  Entries to add to the AWS cluster policy list.  Only makes sense if the authentication mode is API_AND_CONFIG_MAP or API.  For example:
+  access_entries = {
+    mx_admin = {
+      principal_arn = aws_iam_role.mx_admins.arn
+      type          = "STANDARD"
+
+      policy_associations = {
+        admin = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          access_scope = {
+            type = "cluster"
+          }
+        }
+      }
+    }
+  }
+EODOC
+
+}
+
 variable "user_mapping" {
   type = list(object({
     userarn  = string

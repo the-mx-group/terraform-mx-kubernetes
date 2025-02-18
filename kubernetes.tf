@@ -38,7 +38,10 @@ module "kubernetes" {
       "aws-ebs-csi-driver" : {
         "resolve_conflicts_on_create" : "OVERWRITE"
       }
-    } : {}
+    } : {},
+    var.authentication_mode != "CONFIG_MAP" ? {
+      "eks-pod-identity-agent" : {}
+    } : {},
   )
 
   kms_key_administrators = concat(var.kms_key_administrators, [
@@ -118,5 +121,5 @@ module "eks_aws_auth" {
 # make life easier for migration
 moved {
   from = module.eks_auth.kubernetes_config_map_v1_data.aws_auth[0]
-  to  = module.eks_aws_auth.kubernetes_config_map_v1_data.aws_auth[0]
+  to   = module.eks_aws_auth.kubernetes_config_map_v1_data.aws_auth[0]
 }

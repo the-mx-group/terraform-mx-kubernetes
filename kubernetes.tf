@@ -49,8 +49,6 @@ module "kubernetes" {
     data.aws_iam_session_context.current.issuer_arn
   ])
 
-  enable_cluster_creator_admin_permissions = var.authentication_mode != "CONFIG_MAP" # enable creator admin permissions as long as we're not in config map mode
-
   access_entries = var.access_entries
 
   subnet_ids = concat(

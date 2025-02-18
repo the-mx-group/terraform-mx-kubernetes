@@ -1,9 +1,11 @@
 data "aws_eks_cluster" "kubernetes" {
   name = module.kubernetes.cluster_name
+  depends_on = [ module.kubernetes ]
 }
 
 data "aws_eks_cluster_auth" "kubernetes" {
   name = module.kubernetes.cluster_name
+  depends_on = [ module.kubernetes ]
 }
 
 provider "kubernetes" {

@@ -36,7 +36,8 @@ module "kubernetes" {
     },
     var.ebs_addon_enabled ? {
       "aws-ebs-csi-driver" : {
-        "resolve_conflicts_on_create" : "OVERWRITE"
+        "resolve_conflicts_on_create" : "OVERWRITE",
+        "service_account_role_arn": one(aws_iam_role.ebs-csi-controller-role).arn
       }
     } : {},
     var.authentication_mode != "CONFIG_MAP" ? {

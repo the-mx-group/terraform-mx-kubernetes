@@ -149,7 +149,7 @@ resource "kubernetes_cluster_role" "autoscaler" {
 
   rule {
     api_groups     = ["storage.k8s.io"]
-    resources      = ["storageclasses", "csinodes", "csidrivers", "csistoragecapacities"]
+    resources      = ["storageclasses", "csinodes", "csidrivers", "csistoragecapacities", "volumeattachments"]
     verbs          = ["watch", "list", "get"]
   }
 

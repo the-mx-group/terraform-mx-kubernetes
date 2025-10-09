@@ -12,9 +12,6 @@ locals {
   // metrics
   metrics_version = "3.12.2"   // latest helm chart from https://github.com/kubernetes-sigs/metrics-server/releases
 
-  // external dns
-  external_dns_helm_version = "8.3.9" // uses https://artifacthub.io/packages/helm/bitnami/external-dns
-
   // prometheus
   prometheus_stack_version = "65.2.0" // https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack/
 

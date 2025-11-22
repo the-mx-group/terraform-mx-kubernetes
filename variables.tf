@@ -13,9 +13,23 @@ variable "kubernetes_version" {
   description = "The Kubernetes version to deploy"
 }
 
-variable "instance_types" {
-  type        = list(string)
-  description = "The instance types to provision (e.g., t3.medium)"
+variable "node_groups" {
+  type = list(object({
+    name         = string
+    min_nodes    = number
+    max_nodes    = number
+    disk_size_gb = number
+    ami_type     = string # See the [AWS documentation](https://docs.aws.amazon.com/eks/latest/APIReference/API_Nodegroup.html#AmazonEKS-Type-Nodegroup-amiType) for valid values
+    instance_type = optional(string)
+    spot_options = optional(object({
+      block_duration_minutes         = optional(number)
+      instance_interruption_behavior = optional(string)
+      max_price                      = optional(string)
+      spot_instance_type             = optional(string)
+      valid_until                    = optional(string)
+    }))
+  }))
+  description = "Node groups to create in this cluster.  At least one node group must be specified.  Within each node group, either a spot configuration or an instance type must be specified."
 }
 
 variable "autoscaling" {
@@ -28,15 +42,6 @@ variable "autoscaling" {
     condition     = var.autoscaling.enabled == false || length(var.autoscaling.version) > 2
     error_message = "When enabling autoscaling, you must specify a version that works with your Kubernetes version.  See https://github.com/kubernetes/autoscaler/releases?q=v1.22&expanded=true for details."
   }
-}
-
-variable "autoscaling_min" {
-  type        = number
-  description = "The minimum number of cluster nodes available"
-}
-variable "autoscaling_max" {
-  type        = number
-  description = "The minimum number of cluster nodes to provision"
 }
 
 variable "efs_enabled" {
@@ -84,9 +89,9 @@ variable "private_subnets" {
       cidr_block = string
     }))
     nat_gateway = object({
-      gateway_id          = optional(string)
-      cidr_block          = optional(string)
-      az                  = optional(string)
+      gateway_id = optional(string)
+      cidr_block = optional(string)
+      az         = optional(string)
     })
   })
   default     = { networks = [], nat_gateway = { id = null, cidr_block = null, az = null } }
@@ -107,8 +112,8 @@ variable "authentication_mode" {
 }
 
 variable "access_entries" {
-  type = any
-  default = {}
+  type        = any
+  default     = {}
   description = <<EODOC
   Entries to add to the AWS cluster policy list.  Only makes sense if the authentication mode is API_AND_CONFIG_MAP or API.  For example:
   access_entries = {

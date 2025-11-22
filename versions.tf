@@ -12,11 +12,11 @@ terraform {
     }
     helm = {
       source  = "hashicorp/helm"
-      version = "<3"
+      version = ">=3"
     }
     aws = {
       source  = "hashicorp/aws"
-      version = "<6"
+      version = ">=6"
     }
   }
 }

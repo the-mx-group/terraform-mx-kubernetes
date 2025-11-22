@@ -5,20 +5,20 @@ resource "helm_release" "efs-storage-class" {
   version    = "2.4.3"
   namespace  = "kube-system"
 
-  set {
-    name  = "image.repository"
-    value = "602401143452.dkr.ecr.${var.region_code}.amazonaws.com/eks/aws-efs-csi-driver"
-  }
-
-  set {
-    name  = "controller.podAnnotations.cluster-autoscaler\\.kubernetes\\.io/safe-to-evict"
-    value = "\"true\""
-  }
-
-  set {
-    name = "controller.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-    value = aws_iam_role.efs-csi-driver-role.arn
-  }
+  set = [
+    {
+      name  = "image.repository"
+      value = "602401143452.dkr.ecr.${var.region_code}.amazonaws.com/eks/aws-efs-csi-driver"
+    },
+    {
+      name  = "controller.podAnnotations.cluster-autoscaler\\.kubernetes\\.io/safe-to-evict"
+      value = "\"true\""
+    },
+    {
+      name  = "controller.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+      value = aws_iam_role.efs-csi-driver-role.arn
+    }
+  ]
 }
 
 # PDB for efs csi controller, for kube 1.25+

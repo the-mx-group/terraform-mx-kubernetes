@@ -27,11 +27,10 @@ resource "helm_release" "prometheus" {
       )
   )
 
-  dynamic "set" {
-    for_each = local.prometheus_helm_values
-    content {
-      name  = set.key
-      value = set.value
+  set = [
+    for key,value in local.prometheus_helm_values : {
+      name = key
+      value = value
     }
-  }
+  ]
 }

@@ -11,13 +11,14 @@ data "aws_iam_session_context" "current" {
 #actually provision the kubernetes cluster
 module "kubernetes" {
   source                         = "terraform-aws-modules/eks/aws"
-  version                        = "20.33.1" // https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/latest
-  cluster_name                   = local.cluster_name
-  cluster_version                = var.kubernetes_version
-  cluster_endpoint_public_access = true
+  version                        = "21.9.0" // https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/latest
+  name                   = local.cluster_name
+  kubernetes_version                = var.kubernetes_version
+  endpoint_public_access = true
+  endpoint_private_access = true
   authentication_mode            = var.authentication_mode
   #kms_key_enable_default_policy = false # for v19 compat
-  cluster_addons = merge(
+  addons = merge(
     {
       "vpc-cni" : {
         "resolve_conflicts_on_create" : "OVERWRITE",
@@ -37,7 +38,7 @@ module "kubernetes" {
     var.ebs_addon_enabled ? {
       "aws-ebs-csi-driver" : {
         "resolve_conflicts_on_create" : "OVERWRITE",
-        "service_account_role_arn": one(aws_iam_role.ebs-csi-controller-role).arn
+        "service_account_role_arn" : one(aws_iam_role.ebs-csi-controller-role).arn
       }
     } : {},
     var.authentication_mode != "CONFIG_MAP" ? {
@@ -52,13 +53,13 @@ module "kubernetes" {
 
   access_entries = var.access_entries
 
+  vpc_id                          = data.aws_vpc.kubernetes.id
   subnet_ids = concat(
     [for sub in aws_subnet.kubernetes : sub.id],
     [for sub in aws_subnet.kubernetes-private : sub.id]
   )
-  vpc_id                          = data.aws_vpc.kubernetes.id
-  cluster_endpoint_private_access = true
-  cluster_security_group_additional_rules = {
+
+  security_group_additional_rules = {
     for group in var.api_access_security_groups :
     group.security_group => {
       description              = group.description
@@ -70,24 +71,22 @@ module "kubernetes" {
     }
   }
 
-  # Self Managed Node Group(s)
-  eks_managed_node_group_defaults = {
-    update_launch_template_default_version = true
-    iam_role_additional_policies = {
-      "ssm-managed-instance" : "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-    }
-  }
-
   eks_managed_node_groups = {
-    "${var.prog_name}-main" = {
-      min_size     = var.autoscaling_min
-      desired_size = var.autoscaling_min
-      max_size     = var.autoscaling_max
-      version      = var.kubernetes_version
-
-      instance_types = var.instance_types
+    for group in var.node_groups : "${var.prog_name}-${group.name}" => {
+      min_size       = group.min_nodes
+      desired_size   = group.min_nodes
+      max_size       = group.max_nodes
+      version        = var.kubernetes_version
+      volume_size    = group.disk_size_gb
+      spot_options   = group.spot_options
+      instance_types = group.instance_type != null ? [group.instance_type] : null
+      ami_type       = group.ami_type
 
       vpc_security_group_ids = concat([aws_security_group.kubernetes.id], var.node_security_groups)
+
+      iam_role_additional_policies = {
+        AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+      }
 
       tags = merge(var.tags, {
         CostCenter                                        = "${var.cost_center}"

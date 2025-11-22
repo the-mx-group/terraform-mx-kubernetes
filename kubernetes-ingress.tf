@@ -32,7 +32,7 @@ resource "aws_iam_role_policy_attachment" "aws-load-balancer-controller-role" {
 
 resource "kubernetes_service_account" "aws-load-balancer-controller" {
   metadata {
-    name = "aws-load-balancer-controller"
+    name      = "aws-load-balancer-controller"
     namespace = "kube-system"
     annotations = {
       "eks.amazonaws.com/role-arn" = aws_iam_role.aws-load-balancer-controller-role.arn
@@ -47,35 +47,32 @@ resource "helm_release" "aws-load-balancer-controller" {
   version    = local.ingress_helm_version
   namespace  = "kube-system"
 
-  set {
-    name  = "clusterName"
-    value = local.cluster_name
-  }
-
-  set {
-    name  = "serviceAccount.create"
-    value = false
-  }
-
-  set {
-    name  = "region"
-    value = data.aws_region.current.name
-  }
-
-  set {
-    name  = "vpcId"
-    value = data.aws_vpc.kubernetes.id
-  }
-
-  set {
-    name  = "serviceAccount.name"
-    value = "aws-load-balancer-controller"
-  }
-
-  set {
-    name = "podDisruptionBudget.maxUnavailable"
-    value = "1"
-  }
+  set = [
+    {
+      name  = "clusterName"
+      value = local.cluster_name
+    },
+    {
+      name  = "serviceAccount.create"
+      value = false
+    },
+    {
+      name  = "region"
+      value = data.aws_region.current.name
+    },
+    {
+      name  = "vpcId"
+      value = data.aws_vpc.kubernetes.id
+    },
+    {
+      name  = "serviceAccount.name"
+      value = "aws-load-balancer-controller"
+    },
+    {
+      name  = "podDisruptionBudget.maxUnavailable"
+      value = "1"
+    }
+  ]
 
   depends_on = [
     module.kubernetes

@@ -12,32 +12,34 @@ resource "helm_release" "this" {
   EOT
   ]
 
-  set {
-    name  = "podDisruptionBudget.maxUnavailable"
-    value = "1"
-  }
-  set {
-    name  = "rbac.create"
-    value = "true"
-  }
-  set {
-    name  = "provider.name"
-    value = "aws"
-  }
-  set {
-    name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-    value = "${aws_iam_role.this.arn}"
-  }
-  set {
-    name  = "serviceAccount.create"
-    value = "true"
-  }
-  set {
-    name  = "serviceAccount.name"
-    value = "external-dns"
-  }
-  set {
-    name  = "podDisruptionBudget.maxUnavailable"
-    value = "1"
-  }
+  set = [
+    {
+      name  = "podDisruptionBudget.maxUnavailable"
+      value = "1"
+    },
+    {
+      name  = "rbac.create"
+      value = "true"
+    },
+    {
+      name  = "provider.name"
+      value = "aws"
+    },
+    {
+      name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+      value = "${aws_iam_role.this.arn}"
+    },
+    {
+      name  = "serviceAccount.create"
+      value = "true"
+    },
+    {
+      name  = "serviceAccount.name"
+      value = "external-dns"
+    },
+    {
+      name  = "podDisruptionBudget.maxUnavailable"
+      value = "1"
+    }
+  ]
 }

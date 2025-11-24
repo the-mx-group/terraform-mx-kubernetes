@@ -4,7 +4,7 @@
 
 
 resource "aws_iam_role" "this" {
-  name = "cluster-autoscaler-${var.cluster_name}"
+  name = "${var.cluster_name}-cluster-autoscaler"
   description = "Cluster autoscaler role for cluster ${var.cluster_name}"
   assume_role_policy = jsonencode({
     "Version": "2012-10-17",

@@ -14,3 +14,11 @@ variable "kubernetes_version" {
   type        = string
   description = "The Kubernetes version in use on the cluster.  Affects which APIs we use to create resources"
 }
+variable "cluster_oidc_endpoint" {
+  type        = string
+  description = "The OIDC endpoint for the cluster"
+}
+variable "cluster_oidc_arn" {
+  type        = string
+  description = "The OIDC provider ARN for the cluster"
+}

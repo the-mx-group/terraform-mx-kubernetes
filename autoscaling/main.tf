@@ -2,11 +2,33 @@
 # This package configures autoscaling for EKS clusters
 ####
 
+
+resource "aws_iam_role" "this" {
+  name = "cluster-autoscaler-${var.cluster_name}"
+  description = "Cluster autoscaler role for cluster ${var.cluster_name}"
+  assume_role_policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Federated": var.cluster_oidc_arn
+            },
+            "Action": "sts:AssumeRoleWithWebIdentity",
+            "Condition": {
+                "StringEquals": {
+                    "${var.cluster_oidc_endpoint}:aud": "sts.amazonaws.com"
+                }
+            }
+        }
+    ]
+})
+}
+
 # Setup role and policy to allow autoscaling
-resource "aws_iam_role_policy_attachment" "workers_autoscaling" {
-  for_each = var.granted_roles
+resource "aws_iam_role_policy_attachment" "this" {
   policy_arn = aws_iam_policy.worker_autoscaling.arn
-  role       = each.value
+  role       = aws_iam_role.this.name
 }
 
 resource "aws_iam_policy" "worker_autoscaling" {
@@ -74,6 +96,9 @@ resource "kubernetes_service_account" "autoscaler" {
     labels = {
       "k8s-addon" = "cluster-autoscaler.addons.k8s.io"
       "k8s-app" = "cluster-autoscaler"
+    }
+    annotations = {
+      "eks.amazonaws.com/role-arn" = aws_iam_role.this.arn
     }
   }
   automount_service_account_token = true

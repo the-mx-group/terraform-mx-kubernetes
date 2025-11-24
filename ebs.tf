@@ -16,7 +16,7 @@ data "aws_iam_policy_document" "csi-controller-assume-policy" {
 
 resource "aws_iam_role" "ebs-csi-controller-role" {
   count = var.ebs_addon_enabled ? 1 : 0
-  name = "AmazonEKS_EBS_CSI_DriverRole-${local.cluster_name}"
+  name = "${local.cluster_name}-AmazonEKS_EBS_CSI_DriverRole"
   assume_role_policy = data.aws_iam_policy_document.csi-controller-assume-policy.json
 }
 

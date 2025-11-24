@@ -56,7 +56,7 @@ resource "kubernetes_pod_disruption_budget" "efs-csi-controller-pdb" {
 }
 
 resource "aws_iam_policy" "efs-policy" {
-  name        = "AmazonEKS_EFS_CSI_Driver_Policy-${var.cluster_name}"
+  name        = "${var.cluster_name}-AmazonEKS_EFS_CSI_Driver_Policy"
   path        = "/"
   description = "Allows access to EFS resources from Kubernetes"
 
@@ -116,7 +116,7 @@ EOF
 }
 
 resource "aws_iam_role" "efs-csi-driver-role" {
-  name = "AmazonEKS_EFS_CSI_DriverRole-${var.cluster_name}"
+  name = "${var.cluster_name}-AmazonEKS_EFS_CSI_DriverRole"
   assume_role_policy = templatefile("${path.module}/policy/oidc_assume_role_policy.json", {
     OIDC_ARN  = var.oidc_arn,
     OIDC_URL  = replace(var.oidc_url, "https://", ""),

@@ -32,7 +32,7 @@ resource "aws_iam_role_policy_attachment" "this" {
 }
 
 resource "aws_iam_policy" "worker_autoscaling" {
-  name_prefix = "eks-worker-autoscaling-${var.cluster_name}"
+  name_prefix = "${var.cluster_name}-eks-worker-autoscaling"
   description = "EKS worker node autoscaling policy for cluster ${var.cluster_name}"
   policy      = data.aws_iam_policy_document.worker_autoscaling.json
 }

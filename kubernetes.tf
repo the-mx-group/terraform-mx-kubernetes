@@ -107,8 +107,9 @@ module "eks_aws_auth" {
   version                   = "~> 20.0"
   manage_aws_auth_configmap = var.authentication_mode == "API" ? false : true
   aws_auth_roles = concat(var.role_mapping, [
-    {
-      rolearn  = module.kubernetes.eks_managed_node_groups["${var.prog_name}-main"].iam_role_arn
+
+    for group in var.node_groups : {
+      rolearn  = module.kubernetes.eks_managed_node_groups["${var.prog_name}-${group.name}"].iam_role_arn
       username = "system:node:{{EC2PrivateDNSName}}"
       groups   = ["system:bootstrappers", "system:nodes"]
     }

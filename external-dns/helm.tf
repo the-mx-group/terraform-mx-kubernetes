@@ -40,6 +40,10 @@ resource "helm_release" "this" {
     {
       name  = "podDisruptionBudget.maxUnavailable"
       value = "1"
-    }
+    },
+    {
+      name  = "nodeSelector.kubernetes\\.io/os"
+      value = "linux"
+    },
   ]
 }

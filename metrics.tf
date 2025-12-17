@@ -14,4 +14,11 @@ resource "helm_release" "metrics-server" {
   chart      = "metrics-server"
   version    = local.metrics_version
   namespace  = local.metrics_namespace
+
+  set = [
+    {
+      name  = "nodeSelector.kubernetes\\.io/os"
+      value = "linux"
+    },
+  ]
 }

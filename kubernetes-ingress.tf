@@ -71,7 +71,12 @@ resource "helm_release" "aws-load-balancer-controller" {
     {
       name  = "podDisruptionBudget.maxUnavailable"
       value = "1"
-    }
+    },
+    {
+      name  = "nodeSelector.kubernetes\\.io/os"
+      value = "linux"
+    },
+
   ]
 
   depends_on = [

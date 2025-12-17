@@ -17,7 +17,11 @@ resource "helm_release" "efs-storage-class" {
     {
       name  = "controller.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
       value = aws_iam_role.efs-csi-driver-role.arn
-    }
+    },
+    {
+      name  = "nodeSelector.kubernetes\\.io/os"
+      value = "linux"
+    },
   ]
 }
 

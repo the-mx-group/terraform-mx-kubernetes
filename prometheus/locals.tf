@@ -10,5 +10,6 @@ locals {
     "defaultRules.rules.kubeSchedulerAlerting" = false,
     "defaultRules.rules.kubeSchedulerRecording" = false,
     "prometheusOperator.kubeletService.enabled" = false,
+    "nodeSelector.kubernetes\\.io/os" = "linux",
   }
 }

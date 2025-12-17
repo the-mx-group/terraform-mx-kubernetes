@@ -304,6 +304,9 @@ resource "kubernetes_deployment" "autoscaler" {
       spec {
         service_account_name = "cluster-autoscaler"
         automount_service_account_token = true
+        node_selector = {
+          "kubernetes.io/os" = "linux"
+        }
         container {
           image = "registry.k8s.io/autoscaling/cluster-autoscaler:v${var.autoscaling_version}"
           image_pull_policy = "Always"

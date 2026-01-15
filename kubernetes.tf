@@ -25,7 +25,9 @@ module "kubernetes" {
         "configuration_values" : jsonencode({
           "env" : {
             "ENABLE_PREFIX_DELEGATION" : "true"
-          }
+          },
+          "enableWindowsIpam" : "true",
+          "enableWindowsPrefixDelegation" : "true"
         })
       },
       "coredns" : {

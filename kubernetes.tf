@@ -24,10 +24,10 @@ module "kubernetes" {
         "resolve_conflicts_on_create" : "OVERWRITE",
         "configuration_values" : jsonencode({
           "env" : {
-            "ENABLE_PREFIX_DELEGATION" : "true",
-            "ENABLE_WINDOWS_IPAM" : "true",
-            "ENABLE_WINDOWS_PREFIX_DELEGATION" : "true"
-          }
+            "ENABLE_PREFIX_DELEGATION" : "true"
+          },
+          "enableWindowsIpam" : "true",
+          "enableWindowsPrefixDelegation" : "true"
         })
       },
       "coredns" : {

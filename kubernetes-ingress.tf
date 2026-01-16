@@ -58,7 +58,7 @@ resource "helm_release" "aws-load-balancer-controller" {
     },
     {
       name  = "region"
-      value = data.aws_region.current.name
+      value = data.aws_region.current.region
     },
     {
       name  = "vpcId"

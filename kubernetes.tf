@@ -18,6 +18,11 @@ module "kubernetes" {
   endpoint_private_access = true
   authentication_mode            = var.authentication_mode
   #kms_key_enable_default_policy = false # for v19 compat
+
+  iam_role_additional_policies = {
+    "Allow Windows node IP assignment" = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
+  }
+
   addons = merge(
     {
       "vpc-cni" : {

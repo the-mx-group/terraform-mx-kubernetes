@@ -12,6 +12,10 @@ alertmanager:
 prometheusOperator:
   nodeSelector:
     kubernetes.io/os: linux
+  admissionWebhooks:
+    patch:
+      nodeSelector:
+        kubernetes.io/os: linux
 
 # grafana is a subchart so nodeselector is set differently
 grafana:

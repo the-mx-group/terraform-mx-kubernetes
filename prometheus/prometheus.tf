@@ -14,6 +14,7 @@ resource "helm_release" "prometheus" {
   values = concat(
     [
       file("${path.module}/lens-scrapers.yaml"),
+      file("${path.module}/linux-only.yaml"),
     ],
     try(
         [yamlencode(

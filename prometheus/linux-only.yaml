@@ -1,0 +1,19 @@
+prometheus:
+  prometheusSpec:
+    nodeSelector:
+      kubernetes.io/os: linux
+
+alertmanager:
+  alertmanagerSpec:
+    nodeSelector:
+      kubernetes.io/os: linux
+
+# operator doesn't have a spec block like prom and alertmanager
+prometheusOperator:
+  nodeSelector:
+    kubernetes.io/os: linux
+
+# grafana is a subchart so nodeselector is set differently
+grafana:
+  nodeSelector:
+    kubernetes.io/os: linux

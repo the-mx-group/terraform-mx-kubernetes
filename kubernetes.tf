@@ -51,6 +51,7 @@ module "kubernetes" {
     var.authentication_mode != "CONFIG_MAP" ? {
       "eks-pod-identity-agent" : {}
     } : {},
+    var.extra_addons != null ? var.extra_addons : {}
   )
 
   kms_key_administrators = concat(var.kms_key_administrators, [

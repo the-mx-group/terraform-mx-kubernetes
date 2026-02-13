@@ -209,3 +209,25 @@ variable "tags" {
   default     = {}
   description = "A map of tags to apply to all resources"
 }
+
+variable "extra_addons" {
+  type        = map(any)
+  default     = null
+  description = <<-EOT
+    A map of extra addons to add to the cluster.  This is passed directly to the eks module, so refer to their documentation for details: https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/latest?tab=inputs#addons
+
+    Note that some addons are either provided automatically or are configurable with flags. These include:
+      * vpc-cni (always on, automatic)
+      * coredns (always on, automatic)
+      * kube-proxy (always on, automatic)
+      * eks-pod-identity-agent (automatic IF authentication_mode is not CONFIG_MAP)
+      * aws-ebs-csi-driver (configurable with ebs_addon_enabled)
+
+    Example:
+    extra_addons = {
+      "aws-secrets-store-csi-driver-provider" : {
+        "resolve_conflicts_on_create" = "OVERWRITE"
+      },
+    }
+    EOT
+}

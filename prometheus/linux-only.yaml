@@ -21,3 +21,8 @@ prometheusOperator:
 grafana:
   nodeSelector:
     kubernetes.io/os: linux
+
+# kube-state-metrics is a subchart so nodeselector is set differently
+kube-state-metrics:
+  nodeSelector:
+    kubernetes.io/os: linux

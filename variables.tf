@@ -15,11 +15,17 @@ variable "kubernetes_version" {
 
 variable "node_groups" {
   type = list(object({
-    name         = string
-    min_nodes    = number
-    max_nodes    = number
-    disk_size_gb = number
-    ami_type     = string # See the [AWS documentation](https://docs.aws.amazon.com/eks/latest/APIReference/API_Nodegroup.html#AmazonEKS-Type-Nodegroup-amiType) for valid values
+    name      = string
+    min_nodes = number
+    max_nodes = number
+    disks = optional(map(object({
+      device_name           = string
+      size_gb               = number
+      type                  = string
+      encrypted             = optional(bool)
+      delete_on_termination = optional(bool)
+    })))
+    ami_type      = string # See the [AWS documentation](https://docs.aws.amazon.com/eks/latest/APIReference/API_Nodegroup.html#AmazonEKS-Type-Nodegroup-amiType) for valid values
     instance_type = optional(string)
     spot_options = optional(object({
       block_duration_minutes         = optional(number)

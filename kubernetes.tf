@@ -85,7 +85,6 @@ module "kubernetes" {
       desired_size   = group.min_nodes
       max_size       = group.max_nodes
       version        = var.kubernetes_version
-      volume_size    = group.disk_size_gb
       spot_options   = group.spot_options
       instance_types = group.instance_type != null ? [group.instance_type] : null
       ami_type       = group.ami_type
@@ -94,6 +93,23 @@ module "kubernetes" {
 
       iam_role_additional_policies = {
         AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+      }
+
+      # volume size doesn't work on custom launch templates
+      # and we need custom launch templates to support tags, security groups, etc
+      # so instead we map custom devices here
+      # see FAQ #1 https://github.com/terraform-aws-modules/terraform-aws-eks/blob/master/docs/faq.md
+
+      block_device_mappings = group.disks == null ? null : {
+        for device in lookup(group, "disks", []) : device.device_name => {
+          device_name = device.device_name
+          ebs = {
+            volume_size = device.size_gb
+            volume_type = device.type
+            encrypted = lookup(device, "encrypted", true)
+            delete_on_termination = lookup(device, "delete_on_termination", true)
+          }
+        }
       }
 
       tags = merge(var.tags, {

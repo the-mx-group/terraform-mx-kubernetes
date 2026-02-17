@@ -16,6 +16,7 @@ resource "helm_release" "prometheus" {
       file("${path.module}/lens-scrapers.yaml"),
       file("${path.module}/linux-only.yaml"),
     ],
+    var.enable_windows ? [file("${path.module}/windows-support.yaml")] : [],
     try(
         [yamlencode(
           {

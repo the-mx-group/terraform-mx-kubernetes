@@ -25,6 +25,14 @@ output "security_group" {
   value = aws_security_group.kubernetes.id
   description = "The ID of the security group created for nodes"
 }
+output "cluster_iam_role_arn" {
+  value = module.kubernetes.cluster_iam_role_arn
+  description = "The arn of the IAM role created for the cluster"
+}
+output "cluster_iam_role_name" {
+  value = module.kubernetes.cluster_iam_role_name
+  description = "The name of the IAM role created for the cluster"
+}
 output "public_subnet_ids" {
   value = [
     for net in aws_subnet.kubernetes : net.id

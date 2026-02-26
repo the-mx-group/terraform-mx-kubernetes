@@ -4,25 +4,25 @@
 
 
 resource "aws_iam_role" "this" {
-  name = "${var.cluster_name}-cluster-autoscaler"
+  name        = "${var.cluster_name}-cluster-autoscaler"
   description = "Cluster autoscaler role for cluster ${var.cluster_name}"
   assume_role_policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "Federated": var.cluster_oidc_arn
-            },
-            "Action": "sts:AssumeRoleWithWebIdentity",
-            "Condition": {
-                "StringEquals": {
-                    "${var.cluster_oidc_endpoint}:aud": "sts.amazonaws.com"
-                }
-            }
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Principal" : {
+          "Federated" : var.cluster_oidc_arn
+        },
+        "Action" : "sts:AssumeRoleWithWebIdentity",
+        "Condition" : {
+          "StringEquals" : {
+            "${var.cluster_oidc_endpoint}:aud" : "sts.amazonaws.com"
+          }
         }
+      }
     ]
-})
+  })
 }
 
 # Setup role and policy to allow autoscaling
@@ -91,11 +91,11 @@ data "aws_iam_policy_document" "worker_autoscaling" {
 # service account
 resource "kubernetes_service_account" "autoscaler" {
   metadata {
-    name = "cluster-autoscaler"
+    name      = "cluster-autoscaler"
     namespace = "kube-system"
     labels = {
       "k8s-addon" = "cluster-autoscaler.addons.k8s.io"
-      "k8s-app" = "cluster-autoscaler"
+      "k8s-app"   = "cluster-autoscaler"
     }
     annotations = {
       "eks.amazonaws.com/role-arn" = aws_iam_role.this.arn
@@ -110,26 +110,26 @@ resource "kubernetes_cluster_role" "autoscaler" {
     name = "cluster-autoscaler"
     labels = {
       "k8s-addon" = "cluster-autoscaler.addons.k8s.io"
-      "k8s-app" = "cluster-autoscaler"
+      "k8s-app"   = "cluster-autoscaler"
     }
   }
 
   rule {
-    api_groups     = [""]
-    resources      = ["events", "endpoints"]
-    verbs          = ["create", "patch"]
+    api_groups = [""]
+    resources  = ["events", "endpoints"]
+    verbs      = ["create", "patch"]
   }
 
   rule {
-    api_groups     = [""]
-    resources      = ["pods/eviction"]
-    verbs          = ["create"]
+    api_groups = [""]
+    resources  = ["pods/eviction"]
+    verbs      = ["create"]
   }
 
   rule {
-    api_groups     = [""]
-    resources      = ["pods/status"]
-    verbs          = ["update"]
+    api_groups = [""]
+    resources  = ["pods/status"]
+    verbs      = ["update"]
   }
 
   rule {
@@ -140,14 +140,14 @@ resource "kubernetes_cluster_role" "autoscaler" {
   }
 
   rule {
-    api_groups     = [""]
-    resources      = ["nodes"]
-    verbs          = ["watch", "list", "get", "update"]
+    api_groups = [""]
+    resources  = ["nodes"]
+    verbs      = ["watch", "list", "get", "update"]
   }
 
   rule {
-    api_groups     = [""]
-    resources      = [
+    api_groups = [""]
+    resources = [
       "namespaces",
       "pods",
       "services",
@@ -155,43 +155,43 @@ resource "kubernetes_cluster_role" "autoscaler" {
       "persistentvolumeclaims",
       "persistentvolumes",
     ]
-    verbs          = ["watch", "list", "get"]
+    verbs = ["watch", "list", "get"]
   }
 
   rule {
-    api_groups     = ["extensions"]
-    resources      = ["replicasets", "daemonsets"]
-    verbs          = ["watch", "list", "get"]
+    api_groups = ["extensions"]
+    resources  = ["replicasets", "daemonsets"]
+    verbs      = ["watch", "list", "get"]
   }
 
   rule {
-    api_groups     = ["policy"]
-    resources      = ["poddisruptionbudgets"]
-    verbs          = ["watch", "list"]
+    api_groups = ["policy"]
+    resources  = ["poddisruptionbudgets"]
+    verbs      = ["watch", "list"]
   }
 
   rule {
-    api_groups     = ["apps"]
-    resources      = ["statefulsets", "replicasets", "daemonsets"]
-    verbs          = ["watch", "list", "get"]
+    api_groups = ["apps"]
+    resources  = ["statefulsets", "replicasets", "daemonsets"]
+    verbs      = ["watch", "list", "get"]
   }
 
   rule {
-    api_groups     = ["storage.k8s.io"]
-    resources      = ["storageclasses", "csinodes", "csidrivers", "csistoragecapacities", "volumeattachments"]
-    verbs          = ["watch", "list", "get"]
+    api_groups = ["storage.k8s.io"]
+    resources  = ["storageclasses", "csinodes", "csidrivers", "csistoragecapacities", "volumeattachments"]
+    verbs      = ["watch", "list", "get"]
   }
 
   rule {
-    api_groups     = ["batch", "extensions"]
-    resources      = ["jobs"]
-    verbs          = ["get", "list", "watch", "patch"]
+    api_groups = ["batch", "extensions"]
+    resources  = ["jobs"]
+    verbs      = ["get", "list", "watch", "patch"]
   }
 
   rule {
-    api_groups     = ["coordination.k8s.io"]
-    resources      = ["leases"]
-    verbs          = ["create"]
+    api_groups = ["coordination.k8s.io"]
+    resources  = ["leases"]
+    verbs      = ["create"]
   }
 
   rule {
@@ -200,23 +200,29 @@ resource "kubernetes_cluster_role" "autoscaler" {
     resources      = ["leases"]
     verbs          = ["get", "update"]
   }
+
+  rule {
+    api_groups = ["resource.k8s.io"]
+    resources  = ["resourceclaims", "resourceslices", "deviceclasses"]
+    verbs      = ["get", "list", "watch"]
+  }
 }
 
 #scaler entity role
 resource "kubernetes_role" "autoscaler" {
   metadata {
-    name = "cluster-autoscaler"
+    name      = "cluster-autoscaler"
     namespace = "kube-system"
     labels = {
       "k8s-addon" = "cluster-autoscaler.addons.k8s.io"
-      "k8s-app" = "cluster-autoscaler"
+      "k8s-app"   = "cluster-autoscaler"
     }
   }
 
   rule {
-    api_groups     = [""]
-    resources      = ["configmaps"]
-    verbs          = ["create","list","watch"]
+    api_groups = [""]
+    resources  = ["configmaps"]
+    verbs      = ["create", "list", "watch"]
   }
 
   rule {
@@ -233,7 +239,7 @@ resource "kubernetes_cluster_role_binding" "autoscaler" {
     name = "cluster-autoscaler"
     labels = {
       "k8s-addon" = "cluster-autoscaler.addons.k8s.io"
-      "k8s-app" = "cluster-autoscaler"
+      "k8s-app"   = "cluster-autoscaler"
     }
   }
 
@@ -251,11 +257,11 @@ resource "kubernetes_cluster_role_binding" "autoscaler" {
 
 resource "kubernetes_role_binding" "autoscaler" {
   metadata {
-    name = "cluster-autoscaler"
+    name      = "cluster-autoscaler"
     namespace = "kube-system"
     labels = {
       "k8s-addon" = "cluster-autoscaler.addons.k8s.io"
-      "k8s-app" = "cluster-autoscaler"
+      "k8s-app"   = "cluster-autoscaler"
     }
   }
 
@@ -274,7 +280,7 @@ resource "kubernetes_role_binding" "autoscaler" {
 # and deploy the actual autoscaler deployment
 resource "kubernetes_deployment" "autoscaler" {
   metadata {
-    name = "cluster-autoscaler"
+    name      = "cluster-autoscaler"
     namespace = "kube-system"
     labels = {
       "app" = "cluster-autoscaler"
@@ -297,27 +303,27 @@ resource "kubernetes_deployment" "autoscaler" {
         }
         annotations = {
           "prometheus.io/scrape" = "true"
-          "prometheus.io/port" = "8085"
+          "prometheus.io/port"   = "8085"
         }
       }
 
       spec {
-        service_account_name = "cluster-autoscaler"
+        service_account_name            = "cluster-autoscaler"
         automount_service_account_token = true
         node_selector = {
           "kubernetes.io/os" = "linux"
         }
         container {
-          image = "registry.k8s.io/autoscaling/cluster-autoscaler:v${var.autoscaling_version}"
+          image             = "registry.k8s.io/autoscaling/cluster-autoscaler:v${var.autoscaling_version}"
           image_pull_policy = "Always"
-          name  = "cluster-autoscaler"
+          name              = "cluster-autoscaler"
 
           resources {
             limits = {
               cpu    = "100m"
               memory = "600Mi"
             }
-            requests =  {
+            requests = {
               cpu    = "100m"
               memory = "300Mi"
             }
@@ -334,9 +340,9 @@ resource "kubernetes_deployment" "autoscaler" {
           ]
 
           volume_mount {
-            name = "ssl-certs"
+            name       = "ssl-certs"
             mount_path = "/etc/ssl/certs/ca-certificates.crt" #/etc/ssl/certs/ca-bundle.crt for Amazon Linux Worker Nodes
-            read_only = true
+            read_only  = true
           }
         }
 
@@ -356,7 +362,7 @@ resource "kubernetes_deployment" "autoscaler" {
 resource "kubernetes_pod_disruption_budget_v1" "autoscaler" {
   count = tonumber(var.kubernetes_version) >= 1.25 ? 1 : 0
   metadata {
-    name = "cluster-autoscaler"
+    name      = "cluster-autoscaler"
     namespace = "kube-system"
     labels = {
       "app" = "cluster-autoscaler"
@@ -376,7 +382,7 @@ resource "kubernetes_pod_disruption_budget_v1" "autoscaler" {
 resource "kubernetes_pod_disruption_budget" "autoscaler" {
   count = tonumber(var.kubernetes_version) < 1.25 ? 1 : 0
   metadata {
-    name = "cluster-autoscaler"
+    name      = "cluster-autoscaler"
     namespace = "kube-system"
     labels = {
       "app" = "cluster-autoscaler"

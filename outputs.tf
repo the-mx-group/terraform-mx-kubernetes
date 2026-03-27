@@ -9,6 +9,10 @@ output "oidc_arn" {
   value = module.kubernetes.oidc_provider_arn
   description = "ARN for the OIDC provider for this cluster"
 }
+output "oidc_url" {
+  value = module.kubernetes.oidc_provider
+  description = "URL for the OIDC provider for this cluster (minus the https:// prefix)"
+}
 output "cluster_id" {
   value = module.kubernetes.cluster_name
   description = "Cluster ID"

@@ -89,7 +89,7 @@ data "aws_iam_policy_document" "worker_autoscaling" {
 ####
 
 # service account
-resource "kubernetes_service_account" "autoscaler" {
+resource "kubernetes_service_account_v1" "autoscaler" {
   metadata {
     name      = "cluster-autoscaler"
     namespace = "kube-system"
@@ -105,7 +105,7 @@ resource "kubernetes_service_account" "autoscaler" {
 }
 
 #cluster role
-resource "kubernetes_cluster_role" "autoscaler" {
+resource "kubernetes_cluster_role_v1" "autoscaler" {
   metadata {
     name = "cluster-autoscaler"
     labels = {
@@ -209,7 +209,7 @@ resource "kubernetes_cluster_role" "autoscaler" {
 }
 
 #scaler entity role
-resource "kubernetes_role" "autoscaler" {
+resource "kubernetes_role_v1" "autoscaler" {
   metadata {
     name      = "cluster-autoscaler"
     namespace = "kube-system"
@@ -234,7 +234,7 @@ resource "kubernetes_role" "autoscaler" {
 }
 
 #bind the roles to the service account
-resource "kubernetes_cluster_role_binding" "autoscaler" {
+resource "kubernetes_cluster_role_binding_v1" "autoscaler" {
   metadata {
     name = "cluster-autoscaler"
     labels = {
@@ -255,7 +255,7 @@ resource "kubernetes_cluster_role_binding" "autoscaler" {
   }
 }
 
-resource "kubernetes_role_binding" "autoscaler" {
+resource "kubernetes_role_binding_v1" "autoscaler" {
   metadata {
     name      = "cluster-autoscaler"
     namespace = "kube-system"
@@ -278,7 +278,7 @@ resource "kubernetes_role_binding" "autoscaler" {
 }
 
 # and deploy the actual autoscaler deployment
-resource "kubernetes_deployment" "autoscaler" {
+resource "kubernetes_deployment_v1" "autoscaler" {
   metadata {
     name      = "cluster-autoscaler"
     namespace = "kube-system"
@@ -358,29 +358,7 @@ resource "kubernetes_deployment" "autoscaler" {
   }
 }
 
-# PDB for autoscaler, for kube 1.25+
 resource "kubernetes_pod_disruption_budget_v1" "autoscaler" {
-  count = tonumber(var.kubernetes_version) >= 1.25 ? 1 : 0
-  metadata {
-    name      = "cluster-autoscaler"
-    namespace = "kube-system"
-    labels = {
-      "app" = "cluster-autoscaler"
-    }
-  }
-  spec {
-    max_unavailable = "1"
-    selector {
-      match_labels = {
-        "app" = "cluster-autoscaler"
-      }
-    }
-  }
-}
-
-# PDB for autoscaler, for kube 1.24 and prior
-resource "kubernetes_pod_disruption_budget" "autoscaler" {
-  count = tonumber(var.kubernetes_version) < 1.25 ? 1 : 0
   metadata {
     name      = "cluster-autoscaler"
     namespace = "kube-system"

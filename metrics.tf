@@ -2,7 +2,7 @@
 # Install these formulas directly into cluster without checking specs in Terraform
 ###
 
-resource "kubernetes_namespace" "metrics" {
+resource "kubernetes_namespace_v1" "metrics" {
   metadata {
     name = local.metrics_namespace
   }

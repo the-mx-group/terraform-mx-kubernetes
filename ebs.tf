@@ -20,8 +20,14 @@ resource "aws_iam_role" "ebs-csi-controller-role" {
   assume_role_policy = data.aws_iam_policy_document.csi-controller-assume-policy.json
 }
 
-resource "aws_iam_role_policy_attachment" "ebs-csi-controller-role" {
-  count = var.ebs_addon_enabled ? 1 : 0
-  role       = one(aws_iam_role.ebs-csi-controller-role).name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+resource "aws_iam_role_policy_attachments_exclusive" "ebs-csi-controller-role" {
+  count     = var.ebs_addon_enabled ? 1 : 0
+  role_name = one(aws_iam_role.ebs-csi-controller-role).name
+  policy_arns = ["arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"]
+}
+
+resource "aws_iam_role_policies_exclusive" "ebs-csi-controller-role" {
+  count        = var.ebs_addon_enabled ? 1 : 0
+  role_name    = one(aws_iam_role.ebs-csi-controller-role).name
+  policy_names = []
 }

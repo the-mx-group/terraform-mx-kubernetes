@@ -2,7 +2,7 @@ resource "helm_release" "this" {
   name       = "external-dns"
   repository = "https://kubernetes-sigs.github.io/external-dns/"
   chart      = "external-dns"
-  version    = "1.19.0"
+  version    = "1.21.1" # curl -s https://kubernetes-sigs.github.io/external-dns/index.yaml | grep version | head -n 6
   namespace  = "kube-system"
 
   values = [<<-EOT

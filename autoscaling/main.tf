@@ -253,6 +253,11 @@ resource "kubernetes_cluster_role_binding_v1" "autoscaler" {
     name      = "cluster-autoscaler"
     namespace = "kube-system"
   }
+
+  depends_on = [
+    kubernetes_cluster_role_v1.autoscaler,
+    kubernetes_service_account_v1.autoscaler,
+  ]
 }
 
 resource "kubernetes_role_binding_v1" "autoscaler" {
@@ -275,10 +280,22 @@ resource "kubernetes_role_binding_v1" "autoscaler" {
     name      = "cluster-autoscaler"
     namespace = "kube-system"
   }
+
+  depends_on = [
+    kubernetes_role_v1.autoscaler,
+    kubernetes_service_account_v1.autoscaler,
+  ]
 }
 
 # and deploy the actual autoscaler deployment
 resource "kubernetes_deployment_v1" "autoscaler" {
+  depends_on = [
+    aws_iam_role_policy_attachment.this,
+    kubernetes_service_account_v1.autoscaler,
+    kubernetes_cluster_role_binding_v1.autoscaler,
+    kubernetes_role_binding_v1.autoscaler,
+  ]
+
   metadata {
     name      = "cluster-autoscaler"
     namespace = "kube-system"

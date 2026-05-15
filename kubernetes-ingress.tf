@@ -38,6 +38,8 @@ resource "kubernetes_service_account_v1" "aws-load-balancer-controller" {
       "eks.amazonaws.com/role-arn" = aws_iam_role.aws-load-balancer-controller-role.arn
     }
   }
+
+  depends_on = [aws_iam_role_policy_attachment.aws-load-balancer-controller-role]
 }
 
 resource "helm_release" "aws-load-balancer-controller" {
@@ -80,6 +82,7 @@ resource "helm_release" "aws-load-balancer-controller" {
   ]
 
   depends_on = [
-    module.kubernetes
+    module.kubernetes,
+    kubernetes_service_account_v1.aws-load-balancer-controller,
   ]
 }

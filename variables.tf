@@ -27,6 +27,7 @@ variable "node_groups" {
     })))
     ami_type      = string # See the [AWS documentation](https://docs.aws.amazon.com/eks/latest/APIReference/API_Nodegroup.html#AmazonEKS-Type-Nodegroup-amiType) for valid values
     instance_type = optional(string)
+    capacity_type = optional(string) # either "ON_DEMAND" or "SPOT".  If not provided, we'll infer it based on whether spot_options is provided
     spot_options = optional(object({
       block_duration_minutes         = optional(number)
       instance_interruption_behavior = optional(string)

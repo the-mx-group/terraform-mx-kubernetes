@@ -11,7 +11,7 @@ data "aws_iam_session_context" "current" {
 #actually provision the kubernetes cluster
 module "kubernetes" {
   source                         = "terraform-aws-modules/eks/aws"
-  version                        = "21.9.0" // https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/latest
+  version                        = "21.20.0" // https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/latest
   name                   = local.cluster_name
   kubernetes_version                = var.kubernetes_version
   endpoint_public_access = true
@@ -85,7 +85,11 @@ module "kubernetes" {
       desired_size   = group.min_nodes
       max_size       = group.max_nodes
       version        = var.kubernetes_version
-      spot_options   = group.spot_options
+      capacity_type  = group.capacity_type != null ? group.capacity_type : (group.spot_options != null ? "SPOT" : "ON_DEMAND")
+      instance_market_options = group.spot_options != null ? {
+        market_type = "SPOT"
+        spot_options = group.spot_options
+      } : null
       instance_types = group.instance_type != null ? [group.instance_type] : null
       ami_type       = group.ami_type
 

@@ -1854,13 +1854,206 @@
     {
       "type": "row",
       "id": 32,
-      "title": "Kubernetes API server  \u2014  RED (cluster-wide)",
+      "title": "DNS health  \u2014  CoreDNS (cluster-wide; requires coredns scrape)",
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
         "y": 76
+      },
+      "panels": []
+    },
+    {
+      "type": "timeseries",
+      "title": "DNS query rate by type",
+      "description": "CoreDNS request rate by query type.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "lineWidth": 1,
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "max",
+            "mean",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum by(type)(rate(coredns_dns_requests_total[5m]))",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "legendFormat": "{{type}}"
+        }
+      ],
+      "id": 33,
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 77
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "DNS responses by rcode (watch SERVFAIL)",
+      "description": "SERVFAIL/REFUSED climbing = DNS resolution failures. NXDOMAIN is usually normal app probing.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "lineWidth": 1,
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "max",
+            "mean",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum by(rcode)(rate(coredns_dns_responses_total[5m]))",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "legendFormat": "{{rcode}}"
+        }
+      ],
+      "id": 34,
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 77
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "DNS latency p99",
+      "description": "CoreDNS server-side response latency.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "lineWidth": 1,
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "max",
+            "mean",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.99, sum by(le)(rate(coredns_dns_request_duration_seconds_bucket[5m])))",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "legendFormat": "p99"
+        }
+      ],
+      "id": 35,
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 77
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      }
+    },
+    {
+      "type": "row",
+      "id": 36,
+      "title": "Kubernetes API server  \u2014  RED (cluster-wide)",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 85
       },
       "panels": []
     },
@@ -1912,12 +2105,12 @@
           "legendFormat": "{{verb}}"
         }
       ],
-      "id": 33,
+      "id": 37,
       "gridPos": {
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 77
+        "y": 86
       },
       "datasource": {
         "type": "prometheus",
@@ -1979,12 +2172,12 @@
           }
         }
       ],
-      "id": 34,
+      "id": 38,
       "gridPos": {
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 77
+        "y": 86
       },
       "datasource": {
         "type": "prometheus",
@@ -2039,12 +2232,12 @@
           "legendFormat": "{{verb}}"
         }
       ],
-      "id": 35,
+      "id": 39,
       "gridPos": {
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 77
+        "y": 86
       },
       "datasource": {
         "type": "prometheus",

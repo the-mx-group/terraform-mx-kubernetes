@@ -262,3 +262,32 @@ prometheus:
             action: replace
             regex: (.+)
             target_label: kubernetes_namespace
+
+      # Scrape the cluster-autoscaler (kube-system) so we get scaling-limit /
+      # node-churn metrics (cluster_autoscaler_*). It already carries the
+      # prometheus.io/scrape + prometheus.io/port=8085 annotations, but the
+      # kubernetes-pods job above only looks at the lens-metrics namespace, so it
+      # needs its own discovery here.
+      - job_name: "cluster-autoscaler"
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names:
+                - kube-system
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_label_app]
+            action: keep
+            regex: cluster-autoscaler
+          - source_labels: [__meta_kubernetes_pod_ip]
+            action: replace
+            regex: (.+)
+            replacement: $1:8085
+            target_label: __address__
+          - action: labelmap
+            regex: __meta_kubernetes_pod_label_(.+)
+          - source_labels: [__meta_kubernetes_namespace]
+            action: replace
+            target_label: kubernetes_namespace
+          - source_labels: [__meta_kubernetes_pod_name]
+            action: replace
+            target_label: kubernetes_pod_name

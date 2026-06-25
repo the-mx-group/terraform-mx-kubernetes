@@ -861,7 +861,7 @@
         },
         {
           "expr": "sum(kube_pod_container_resource_requests{namespace=\"$namespace\",resource=\"cpu\"})",
-          "refId": "A",
+          "refId": "B",
           "datasource": {
             "type": "prometheus",
             "uid": "prometheus"
@@ -870,7 +870,7 @@
         },
         {
           "expr": "sum(kube_pod_container_resource_limits{namespace=\"$namespace\",resource=\"cpu\"})",
-          "refId": "A",
+          "refId": "C",
           "datasource": {
             "type": "prometheus",
             "uid": "prometheus"
@@ -952,7 +952,7 @@
         },
         {
           "expr": "sum by(horizontalpodautoscaler)(kube_horizontalpodautoscaler_status_desired_replicas{namespace=\"$namespace\"})",
-          "refId": "A",
+          "refId": "B",
           "datasource": {
             "type": "prometheus",
             "uid": "prometheus"
@@ -961,7 +961,7 @@
         },
         {
           "expr": "sum by(horizontalpodautoscaler)(kube_horizontalpodautoscaler_spec_max_replicas{namespace=\"$namespace\"})",
-          "refId": "A",
+          "refId": "C",
           "datasource": {
             "type": "prometheus",
             "uid": "prometheus"

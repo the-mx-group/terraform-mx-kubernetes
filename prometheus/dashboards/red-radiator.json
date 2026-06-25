@@ -956,7 +956,7 @@
         },
         {
           "expr": "count(kube_node_status_condition{condition=\"Ready\",status=\"true\"})",
-          "refId": "A",
+          "refId": "B",
           "datasource": {
             "type": "prometheus",
             "uid": "prometheus"
@@ -1094,7 +1094,7 @@
         },
         {
           "expr": "max(cluster_autoscaler_max_nodes_count)",
-          "refId": "A",
+          "refId": "B",
           "datasource": {
             "type": "prometheus",
             "uid": "prometheus"

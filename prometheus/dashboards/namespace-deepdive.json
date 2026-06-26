@@ -92,7 +92,8 @@
               }
             ]
           },
-          "mappings": []
+          "mappings": [],
+          "links": []
         },
         "overrides": []
       },
@@ -137,7 +138,7 @@
     {
       "type": "stat",
       "title": "Pods not ready",
-      "description": "",
+      "description": "Running pods not Ready (excludes completed Job pods).",
       "fieldConfig": {
         "defaults": {
           "unit": "short",
@@ -161,7 +162,8 @@
               }
             ]
           },
-          "mappings": []
+          "mappings": [],
+          "links": []
         },
         "overrides": []
       },
@@ -181,7 +183,7 @@
       },
       "targets": [
         {
-          "expr": "count(max by(pod)(kube_pod_status_ready{namespace=\"$namespace\",condition=\"true\"}) == 0) or vector(0)",
+          "expr": "count((max by(pod)(kube_pod_status_ready{namespace=\"$namespace\",condition=\"true\"}) == 0) and on(pod) (max by(pod)(kube_pod_status_phase{namespace=\"$namespace\",phase=\"Running\"}) == 1)) or vector(0)",
           "refId": "A",
           "datasource": {
             "type": "prometheus",
@@ -230,7 +232,8 @@
               }
             ]
           },
-          "mappings": []
+          "mappings": [],
+          "links": []
         },
         "overrides": []
       },
@@ -295,7 +298,8 @@
               }
             ]
           },
-          "mappings": []
+          "mappings": [],
+          "links": []
         },
         "overrides": []
       },
@@ -360,7 +364,8 @@
               }
             ]
           },
-          "mappings": []
+          "mappings": [],
+          "links": []
         },
         "overrides": []
       },
@@ -425,7 +430,8 @@
               }
             ]
           },
-          "mappings": []
+          "mappings": [],
+          "links": []
         },
         "overrides": []
       },

@@ -2,7 +2,7 @@ resource "helm_release" "efs-storage-class" {
   name       = "efs-storage-class"
   repository = "https://kubernetes-sigs.github.io/aws-efs-csi-driver/"
   chart      = "aws-efs-csi-driver"
-  version    = "2.4.3"
+  version    = "4.4.1"
   namespace  = "kube-system"
 
   set = [

@@ -32,7 +32,8 @@ module "kubernetes" {
             "ENABLE_PREFIX_DELEGATION" : "true"
           },
           "enableWindowsIpam" : "true",
-          "enableWindowsPrefixDelegation" : "true"
+          "enableWindowsPrefixDelegation" : "true",
+          "warmWindowsPrefixTarget" : 1
         })
       },
       "coredns" : {

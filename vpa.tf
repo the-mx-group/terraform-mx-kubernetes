@@ -25,6 +25,11 @@ resource "helm_release" "vpa" {
         name  = "admissionController.nodeSelector.kubernetes\\.io/os"
         value = "linux"
       },
+      {
+        # certGen is a separate job/pod from the admission controller deployment and has its own nodeSelector
+        name  = "admissionController.certGen.nodeSelector.kubernetes\\.io/os"
+        value = "linux"
+      },
     ],
     [
       for key, value in coalesce(var.vpa.settings, {}) : {

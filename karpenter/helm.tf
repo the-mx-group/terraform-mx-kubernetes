@@ -23,6 +23,11 @@ resource "helm_release" "karpenter" {
         clusterEndpoint   = var.cluster_endpoint
         interruptionQueue = module.karpenter.queue_name
       }
+      # the controller runs on the cluster's existing (non-Karpenter-managed) nodes; on hybrid clusters
+      # it must stay off Windows nodes. The chart already defaults to this, but we pin it explicitly.
+      nodeSelector = {
+        "kubernetes.io/os" = "linux"
+      }
     })
   ]
 

@@ -11,12 +11,28 @@ resource "helm_release" "vpa" {
   version    = coalesce(var.vpa.version, local.vpa_version)
   namespace  = coalesce(var.vpa.namespace, "kube-system")
 
-  set = [
-    for key, value in coalesce(var.vpa.settings, {}) : {
-      name  = key
-      value = value
-    }
-  ]
+  set = concat(
+    [
+      {
+        name  = "recommender.nodeSelector.kubernetes\\.io/os"
+        value = "linux"
+      },
+      {
+        name  = "updater.nodeSelector.kubernetes\\.io/os"
+        value = "linux"
+      },
+      {
+        name  = "admissionController.nodeSelector.kubernetes\\.io/os"
+        value = "linux"
+      },
+    ],
+    [
+      for key, value in coalesce(var.vpa.settings, {}) : {
+        name  = key
+        value = value
+      }
+    ]
+  )
 
   depends_on = [module.kubernetes]
 }

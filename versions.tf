@@ -16,7 +16,7 @@ terraform {
     }
     aws = {
       source  = "hashicorp/aws"
-      version = ">=6"
+      version = ">=6.59" # required by the terraform-aws-modules/eks/aws Karpenter submodule, used by the optional ./karpenter module
     }
   }
 }

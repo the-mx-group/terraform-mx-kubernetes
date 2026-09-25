@@ -51,6 +51,15 @@ output "nat_gateway_ip" {
   value = length(aws_eip.nat-gateway) > 0 ? one(aws_eip.nat-gateway).public_ip : null
 }
 
+output "karpenter_node_iam_role_name" {
+  value       = try(one(module.karpenter[*].node_iam_role_name), null)
+  description = "Name of the IAM role created for Karpenter-managed nodes, if Karpenter is enabled"
+}
+output "karpenter_instance_profile_name" {
+  value       = try(one(module.karpenter[*].instance_profile_name), null)
+  description = "Name of the instance profile created for Karpenter-managed nodes, if Karpenter is enabled"
+}
+
 output "routing_tables" {
   value = merge(
     local.create_vpc ? { "public": data.aws_route_table.default.id } : {},

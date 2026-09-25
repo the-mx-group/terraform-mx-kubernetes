@@ -35,6 +35,7 @@ variable "node_groups" {
       spot_instance_type             = optional(string)
       valid_until                    = optional(string)
     }))
+    cluster_autoscaler_enabled = optional(bool, true) # whether this group should carry the k8s.io/cluster-autoscaler/* discovery tags. Defaults to true; set false to keep a group out of cluster-autoscaler's reach (e.g. a Linux group intended to be managed by Karpenter instead)
   }))
   description = "Node groups to create in this cluster.  At least one node group must be specified.  Within each node group, either a spot configuration or an instance type must be specified."
 }
@@ -215,6 +216,64 @@ variable "tags" {
   type        = map(string)
   default     = {}
   description = "A map of tags to apply to all resources"
+}
+
+variable "vpa" {
+  type = object({
+    enabled   = bool
+    version   = optional(string)
+    namespace = optional(string)
+    settings  = optional(map(string))
+  })
+  default     = { enabled : false }
+  description = <<-EOT
+    Whether to install the Vertical Pod Autoscaler (via the official kubernetes/autoscaler vertical-pod-autoscaler Helm chart). Default is false.
+    If enabled, you can optionally override:
+    * version - the Helm chart version to install. Defaults to a known-good version if not specified.
+    * namespace - the Kubernetes namespace to install into. Defaults to "kube-system".
+    * settings - a map of additional Helm `set` values passed through to the chart, e.g. { "updater.updateMode" = "Auto" }
+    EOT
+}
+
+variable "karpenter" {
+  type = object({
+    enabled                           = bool
+    version                           = optional(string)
+    node_iam_role_additional_policies = optional(map(string), {})
+    settings                          = optional(map(string))
+  })
+  default     = { enabled : false }
+  description = <<-EOT
+    Whether to install Karpenter for node autoscaling/provisioning. Default is false.
+
+    When enabled, this provisions the supporting AWS resources via the terraform-aws-modules/eks/aws Karpenter submodule
+    (a controller IAM role associated via EKS Pod Identity, an SQS queue and EventBridge rules for interruption handling,
+    a node IAM role, and an access entry for that node role) and installs the Karpenter controller via its official Helm chart.
+
+    Requires authentication_mode to be API or API_AND_CONFIG_MAP, since Karpenter's node IAM role relies on an EKS access entry.
+
+    You can optionally override:
+    * version - the Karpenter Helm chart version to install. Defaults to a known-good version if not specified.
+    * node_iam_role_additional_policies - extra IAM policies to attach to the Karpenter node IAM role (e.g. AmazonSSMManagedInstanceCore)
+    * settings - a map of additional Helm `set` values passed through to the karpenter chart
+
+    Note: this does not create any NodePool/EC2NodeClass resources. Those define what Karpenter is actually allowed to
+    provision and should be applied separately (e.g. via kubectl or GitOps) once the cluster and Karpenter controller are up.
+
+    Karpenter can happily run alongside autoscaling (cluster-autoscaler) - they manage disjoint capacity, since Karpenter
+    provisions raw EC2 instances directly rather than scaling eks_managed_node_groups. This is useful for heterogeneous
+    clusters, e.g. keeping Windows capacity on cluster-autoscaler-managed node_groups while Karpenter handles Linux capacity:
+    * set cluster_autoscaler_enabled = false on the node_groups entries you don't want cluster-autoscaler touching
+      (e.g. a small bootstrap/system Linux group used to run cluster add-ons and the Karpenter controller itself)
+    * the node security group and all subnets get tagged "karpenter.sh/discovery" = <cluster_name>, for use in your
+      EC2NodeClass subnetSelectorTerms/securityGroupSelectorTerms
+    * the actual Linux/Windows split for Karpenter-provisioned nodes is enforced in your NodePool's requirements
+      (e.g. kubernetes.io/os), since NodePool isn't managed by this module
+    EOT
+  validation {
+    condition     = !var.karpenter.enabled || var.authentication_mode != "CONFIG_MAP"
+    error_message = "Karpenter requires authentication_mode to be API or API_AND_CONFIG_MAP."
+  }
 }
 
 variable "extra_addons" {

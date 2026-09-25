@@ -49,7 +49,7 @@ module "kubernetes" {
         "service_account_role_arn" : one(aws_iam_role.ebs-csi-controller-role).arn
       }
     } : {},
-    var.authentication_mode != "CONFIG_MAP" ? {
+    var.authentication_mode != "CONFIG_MAP" || var.karpenter.enabled ? {
       "eks-pod-identity-agent" : {}
     } : {},
     var.extra_addons != null ? var.extra_addons : {}
@@ -117,11 +117,14 @@ module "kubernetes" {
         }
       }
 
-      tags = merge(var.tags, {
-        CostCenter                                        = "${var.cost_center}"
-        "k8s.io/cluster-autoscaler/enabled"               = "true"
-        "k8s.io/cluster-autoscaler/${local.cluster_name}" = "true"
-      })
+      tags = merge(
+        var.tags,
+        { CostCenter = "${var.cost_center}" },
+        group.cluster_autoscaler_enabled ? {
+          "k8s.io/cluster-autoscaler/enabled"               = "true"
+          "k8s.io/cluster-autoscaler/${local.cluster_name}" = "true"
+        } : {}
+      )
     }
   }
 

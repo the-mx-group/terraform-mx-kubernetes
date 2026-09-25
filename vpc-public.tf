@@ -14,9 +14,12 @@ resource "aws_subnet" "kubernetes" {
   availability_zone       = each.value.az
   map_public_ip_on_launch = true
 
-  tags = {
-    Name                                          = "${var.name} Public ${each.value.az}"
-    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
-    "kubernetes.io/role/elb"                      = "1"
-  }
+  tags = merge(
+    {
+      Name                                          = "${var.name} Public ${each.value.az}"
+      "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+      "kubernetes.io/role/elb"                      = "1"
+    },
+    var.karpenter.enabled ? { "karpenter.sh/discovery" = local.cluster_name } : {}
+  )
 }

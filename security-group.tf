@@ -33,7 +33,8 @@ resource "aws_security_group" "kubernetes" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    Name = "${local.friendly_name} Kubernetes"
-  }
+  tags = merge(
+    { Name = "${local.friendly_name} Kubernetes" },
+    var.karpenter.enabled ? { "karpenter.sh/discovery" = local.cluster_name } : {}
+  )
 }

@@ -15,4 +15,10 @@ locals {
   // prometheus
   prometheus_stack_version = "87.21.0" // https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack/
 
+  // vertical pod autoscaler
+  vpa_version = "0.13.0" // chart version, https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler/charts/vertical-pod-autoscaler (app version 1.8.0)
+
+  // karpenter
+  karpenter_version = "1.14.1" // https://github.com/aws/karpenter-provider-aws/releases
+
 }

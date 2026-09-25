@@ -87,11 +87,14 @@ resource "aws_subnet" "kubernetes-private" {
   availability_zone       = each.value.az
   map_public_ip_on_launch = false
 
-  tags = {
-    Name                                          = "${var.name} Private ${each.value.az}"
-    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
-    "kubernetes.io/role/internal-elb"             = "1"
-  }
+  tags = merge(
+    {
+      Name                                          = "${var.name} Private ${each.value.az}"
+      "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+      "kubernetes.io/role/internal-elb"             = "1"
+    },
+    var.karpenter.enabled ? { "karpenter.sh/discovery" = local.cluster_name } : {}
+  )
 }
 
 resource "aws_route_table_association" "kubernetes-private" {

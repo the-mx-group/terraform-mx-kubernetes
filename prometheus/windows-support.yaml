@@ -1,2 +1,13 @@
 windowsMonitoring:
   enabled: true
+
+prometheus-windows-exporter:
+  # The chart default is '[defaults],memory,container'. The extra collectors expose what we need to
+  # diagnose stalled IIS/ASP.NET containers (socket states, IIS request/connection counts, w3wp
+  # threads/handles, CLR thread contention, GC memory, exception rates).
+  config: |-
+    collectors:
+      enabled: '[defaults],memory,container,tcp,process,iis,netframework_clrlocksandthreads,netframework_clrmemory,netframework_clrexceptions'
+    collector:
+      process:
+        include: 'w3wp.*'

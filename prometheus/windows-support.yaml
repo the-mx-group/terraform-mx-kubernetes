@@ -1,6 +1,52 @@
 windowsMonitoring:
   enabled: true
 
+# Windows containers produce no cAdvisor metrics, so Lens/Freelens pod charts ("Metrics not available at
+# the moment") and the stock Linux compute dashboards are empty for them. windows_exporter's container
+# collector has the same data under windows_container_*, so re-publish it under the cAdvisor names those
+# tools query. The workload identity is in the exported_pod / exported_namespace / exported_container
+# labels (pod / namespace / container on these series are windows_exporter's OWN pod, because Prometheus
+# moves a scraped label aside when it collides with a target label), so the rules copy exported_* back
+# into the standard names. `image` is set because Freelens filters on image!="". The new series carry
+# job="windows-exporter", so they never collide with real cAdvisor series (job="kubelet").
+# Filesystem is not mapped: Windows reports read/write sizes, not usage. Verified on ccg-staging.
+additionalPrometheusRulesMap:
+  windows-cadvisor-compat:
+    groups:
+      - name: windows-cadvisor-compat
+        interval: 30s
+        rules:
+          - record: container_cpu_usage_seconds_total
+            expr: |
+              label_replace(label_replace(label_replace(label_replace(
+                windows_container_cpu_usage_seconds_total{exported_pod!=""},
+                "pod", "$1", "exported_pod", "(.+)"),
+                "namespace", "$1", "exported_namespace", "(.+)"),
+                "container", "$1", "exported_container", "(.+)"),
+                "image", "windows", "container", ".+")
+          - record: container_memory_working_set_bytes
+            expr: |
+              label_replace(label_replace(label_replace(label_replace(
+                windows_container_private_working_set_usage{exported_pod!=""},
+                "pod", "$1", "exported_pod", "(.+)"),
+                "namespace", "$1", "exported_namespace", "(.+)"),
+                "container", "$1", "exported_container", "(.+)"),
+                "image", "windows", "container", ".+")
+          - record: container_network_receive_bytes_total
+            expr: |
+              label_replace(label_replace(label_replace(
+                windows_container_network_received_bytes_total{exported_pod!=""},
+                "pod", "$1", "exported_pod", "(.+)"),
+                "namespace", "$1", "exported_namespace", "(.+)"),
+                "container", "$1", "exported_container", "(.+)")
+          - record: container_network_transmit_bytes_total
+            expr: |
+              label_replace(label_replace(label_replace(
+                windows_container_network_transmitted_bytes_total{exported_pod!=""},
+                "pod", "$1", "exported_pod", "(.+)"),
+                "namespace", "$1", "exported_namespace", "(.+)"),
+                "container", "$1", "exported_container", "(.+)")
+
 prometheus-windows-exporter:
   # Chart default is '[defaults],memory,container'. Added (verified on ccg-staging, windows_exporter 0.31.8):
   #   tcp      node-level socket/connection states (established, time_wait, failures, resets)

@@ -2,12 +2,25 @@ windowsMonitoring:
   enabled: true
 
 prometheus-windows-exporter:
-  # The chart default is '[defaults],memory,container'. The extra collectors expose what we need to
-  # diagnose stalled IIS/ASP.NET containers (socket states, IIS request/connection counts, w3wp
-  # threads/handles, CLR thread contention, GC memory, exception rates).
+  # Chart default is '[defaults],memory,container'. Added (verified on ccg-staging, windows_exporter 0.31.8):
+  #   tcp      node-level socket/connection states (established, time_wait, failures, resets)
+  #   process  per-process threads, handles, private bytes and CPU, limited to w3wp. The exporter runs on the
+  #            node and sees every container's w3wp, but the series are keyed by process_id only: the
+  #            pod/container labels on them are the exporter's own, so mapping a w3wp to its web pod needs
+  #            another source.
+  # Deliberately NOT enabled:
+  #   iis        IIS is not installed on the nodes (it runs inside the containers), so it only logs a warning
+  #              and exports windows_iis_info.
+  #   netframework  only sees the nodes' own .NET processes (EKS-WindowsServiceHost), never the containers'
+  #              w3wp CLR counters. Note: in 0.31 the old netframework_clr* names no longer exist (starting with
+  #              them aborts the exporter: "unknown collector"), and netframework.enabled must be a YAML list.
+  #
+  # The chart does not restart the DaemonSet when this changes: after applying, run
+  #   kubectl -n monitoring rollout restart ds/monitoring-prometheus-windows-exporter
+  # An invalid collector name makes every restarted exporter pod crash-loop, so test on staging first.
   config: |-
     collectors:
-      enabled: '[defaults],memory,container,tcp,process,iis,netframework_clrlocksandthreads,netframework_clrmemory,netframework_clrexceptions'
+      enabled: '[defaults],memory,container,tcp,process'
     collector:
       process:
         include: 'w3wp.*'

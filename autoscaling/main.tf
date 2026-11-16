@@ -49,7 +49,11 @@ data "aws_iam_policy_document" "worker_autoscaling" {
       "autoscaling:DescribeScalingActivities",
       "autoscaling:DescribeTags",
       "ec2:DescribeInstanceTypes",
-      "ec2:DescribeLaunchTemplateVersions"
+      "ec2:DescribeLaunchTemplateVersions",
+      # EKS API calls don't support the autoscaling:ResourceTag condition keys used in the statement
+      # below, so this must live in an unconditioned statement or it is always denied (403), which
+      # leaves the autoscaler unable to read managed node group labels/taints and unable to scale up.
+      "eks:DescribeNodegroup"
     ]
 
     resources = ["*"]
@@ -63,8 +67,7 @@ data "aws_iam_policy_document" "worker_autoscaling" {
       "autoscaling:SetDesiredCapacity",
       "autoscaling:TerminateInstanceInAutoScalingGroup",
       "ec2:DescribeImages",
-      "ec2:GetInstanceTypesFromInstanceRequirements",
-      "eks:DescribeNodegroup"
+      "ec2:GetInstanceTypesFromInstanceRequirements"
     ]
 
     resources = ["*"]

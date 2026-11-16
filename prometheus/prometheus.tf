@@ -17,6 +17,7 @@ resource "helm_release" "prometheus" {
       file("${path.module}/linux-only.yaml"),
     ],
     var.enable_windows ? [file("${path.module}/windows-support.yaml")] : [],
+    var.enable_autoscaler_alerts ? [templatefile("${path.module}/autoscaler-alerts.yaml.tpl", { cluster_name = var.cluster_name })] : [],
     try(
         [yamlencode(
           {
